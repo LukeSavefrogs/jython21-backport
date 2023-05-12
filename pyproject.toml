@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "polyfills"
+version = "0.1.0"
+description = "Package providing polyfills for newer Python features down to Python 2.1"
+authors = ["Luca Salvarani <lucasalvarani99@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [
+	{ include = "polyfills", from = "src" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
