@@ -1,67 +1,6 @@
 """ Basic implementation of a JSON parser written in pure Python for very old Python versions (2.2 and lower). """
 import re
 
-def get_jython_type(obj):
-    """Return a string representation of the type of the provided object.
-
-    Works both in regular Python and Jython.
-
-    WARNING: because of Jython's limitations it CANNOT detect a boolean type!
-
-    http://graphexploration.cond.org/javadoc/org/python/core/package-summary.html
-    ['Py', 'PyArray', 'PyBeanEvent', 'PyBeanEventProperty', 'PyBeanProperty',
-    'PyBuiltinFunctionSet', 'PyCell', 'PyClass', 'PyCode', 'PyComplex',
-    'PyCompoundCallable', 'PyDictionary', 'PyEllipsis', 'PyException', 'PyFile',
-    'PyFinalizableInstance', 'PyFloat', 'PyFrame', 'PyFunction',
-    'PyFunctionTable', 'PyIgnoreMethodTag', 'PyInstance', 'PyInteger',
-    'PyJavaClass', 'PyJavaInnerClass', 'PyJavaInstance', 'PyJavaPackage',
-    'PyList', 'PyLong', 'PyMetaClass', 'PyMethod', 'PyModule', 'PyNone',
-    'PyNotImplemented', 'PyObject', 'PyProxy', 'PyReflectedConstructor',
-    'PyReflectedField', 'PyReflectedFunction', 'PyRunnable', 'PySequence',
-    'PySingleton', 'PySlice', 'PyString', 'PyStringMap', 'PySyntaxError',
-    'PySystemState', 'PyTableCode', 'PyTraceback', 'PyTuple', 'PyXRange']
-
-    Args:
-        obj (any): The object we need to know the type of.
-
-    Returns:
-        type(str): The type of the provided object.
-    """
-    try:                                # Try checking the string representation
-        type_name = type(obj).__name__
-        if type_name in ["list", "org.python.core.PyList"]:
-            return "list"
-        elif type_name in ["tuple", "org.python.core.PyTuple"]:
-            return "tuple"
-        elif type_name in ["dict", "org.python.core.PyDictionary"]:
-            return "dict"
-        elif type_name in ["str", "org.python.core.PyString"]:
-            return "str"
-        elif type_name in ["int", "org.python.core.PyInteger"]:
-            return "int"
-        elif type_name in ["float", "org.python.core.PyFloat"]:
-            return "float"
-        elif type_name in ["function", "org.python.core.PyFunction"]:
-            return "function"
-        elif type_name in ["class", "org.python.core.PyClass"]:
-            return "class"
-        elif type_name in ["NoneType", "org.python.core.PyNone"]:
-            return "NoneType"
-        else:
-            return "unknown"
-    except:                             # Fallback to duck typing
-        available_methods = dir(obj)
-        if ("append" in available_methods) and ("extend" in available_methods) and ("pop" in available_methods):
-            return "list"
-        elif ("count" in available_methods) and ("index" in available_methods) and ("append" not in available_methods):
-            return "tuple"
-        elif ("clear" in available_methods) and ("items" in available_methods) and ("keys" in available_methods):
-            return "dict"
-        elif len([method for method in available_methods if method.startswith("_")]) == len(available_methods):
-            return "NoneType"
-        else:
-            raise Exception("Couldn't find more info about the type of '%s' using duck typing" % str(obj))
-
 def dumps(
         obj,
         indent=None,          # type: int|None
@@ -88,7 +27,7 @@ def dumps(
     if (truthy_value is None and falsy_value is not None) or (truthy_value is not None and falsy_value is None):
         raise Exception("The 'truthy_value' and 'falsy_value' options MUST be BOTH either set or unset.")
 
-    obj_type = get_jython_type(obj)
+    obj_type = type(obj)
     obj_string_parts = []             # type: list[str]
 
     indent_spaces = 0                 # type: int
@@ -99,7 +38,7 @@ def dumps(
 
 
     #  ---> Handle JSON objects
-    if obj_type == "dict":
+    if obj_type == type({}):
         obj_string_parts.append("{")
 
         for key in obj.keys(): # pyright: ignore[reportGeneralTypeIssues]
@@ -113,7 +52,7 @@ def dumps(
     
 
     #  ---> Handle JSON arrays
-    elif obj_type == "list":
+    elif obj_type == type([]):
         obj_string_parts.append("[")
         for item in obj:
             if len(obj_string_parts) > 1:
@@ -152,21 +91,21 @@ def dumps(
             return "true"
         elif falsy_value is not None and obj == falsy_value:
             return "false"
-        elif obj_type != "str" and str(obj) == "True":
+        elif obj_type != type("") and str(obj) == "True":
             return "true"
-        elif obj_type != "str" and str(obj) == "False":
+        elif obj_type != type("") and str(obj) == "False":
             return "false"
 
         # ---> Base types
-        elif obj_type == "str":
+        elif obj_type == type(""):
             return '"%s"' % str(obj).replace("\\", "\\\\").replace('"', '\\"')
-        elif obj_type == "int":
+        elif obj_type == type(5):
             return str(obj)
-        elif obj_type == "float":
+        elif obj_type == type(5.0):
             return str(obj)
         
         # ---> Null type
-        elif obj_type == "NoneType":
+        elif obj_type == type(None):
             return "null"
     #endif
 
@@ -215,7 +154,7 @@ def loads(
 
 
     # Ensure that the input is a string.
-    if get_jython_type(json_str) != "str":
+    if type(json_str) != type(""):
         raise TypeError('Expected a string, got %s' % type(json_str))
 
     # Define temporary boolean values for old Jython versions (<2.3) that do not support True/False
