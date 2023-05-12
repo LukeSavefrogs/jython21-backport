@@ -1,11 +1,11 @@
 # Jython 2.1 backporting
 
-Collection of features present in `newer Python` versions (`v2.x`, `v3.x`) backported to **legacy Python versions** (tested down to `v2.1`).
+Collection of features present in **newer Python** versions (`v2.x`, `v3.x`) backported to **legacy Python versions** (tested down to `v2.1`).
 
 Supported Python implementation:
 
-- [CPython](https://www.python.org/)
-- [Jython](https://www.jython.org/)
+- [**CPython**](https://www.python.org/)
+- [**Jython**](https://www.jython.org/)
 
 ## Features
 
