@@ -11,10 +11,12 @@ Supported Python implementation:
 
 This package provides backporting for the following features:
 
-- [**`pathlib.Path()`**](src/python21_polyfills/pathlib/) (`Python>=3.4`)
-- [**`sorted()`**](src/python21_polyfills/stdlib/) (`Python>=2.4`)
-- [**`collections.OrderedDict()`**](src/python21_polyfills/collections/) (`Python>=2.7`)
-- [**`json`**](src/python21_polyfills/json/) module (`Python>=2.6`)
+- [**`pathlib.Path()`**](src/polyfills/pathlib/) (`Python>=3.4`)
+- [**`bool`**](src/polyfills/stdlib/types/bool.py) (`Python>=2.3`)
+- [**`dict`**](src/polyfills/stdlib/types/dict.py)
+- [**`sorted()`**](src/polyfills/stdlib/) (`Python>=2.4`)
+- [**`collections.OrderedDict()`**](src/polyfills/collections/) (`Python>=2.7`)
+- [**`json`**](src/polyfills/json/) module (`Python>=2.6`)
 
 ## Tests
 
