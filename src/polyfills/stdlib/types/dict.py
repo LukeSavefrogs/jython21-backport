@@ -60,20 +60,28 @@ class dict:
             return self.__dict__ != other.__dict__
         return self.__dict__ != other
 
-    def __gt__(self, *args, **kwargs):
-        return self.__dict__.__gt__(*args, **kwargs)
-
-    def __ge__(self, *args, **kwargs):
-        return self.__dict__.__ge__(*args, **kwargs)
-
-    def __le__(self, *args, **kwargs):
-        return self.__dict__.__le__(*args, **kwargs)
-
-    def __lt__(self, *args, **kwargs):
-        return self.__dict__.__lt__(*args, **kwargs)
-
     def __len__(self):
         return self.__dict__.__len__()
+
+    # Ordering methods are not supported for dicts
+    #
+    # >>> {"a": 1} > {"a": 0}
+    # Traceback (most recent call last):
+    # File "<stdin>", line 1, in <module>
+    # TypeError: '>' not supported between instances of 'dict' and 'dict'
+    #
+    # def __gt__(self, *args, **kwargs):
+    #     return self.__dict__.__gt__(*args, **kwargs)
+
+    # def __ge__(self, *args, **kwargs):
+    #     return self.__dict__.__ge__(*args, **kwargs)
+
+    # def __le__(self, *args, **kwargs):
+    #     return self.__dict__.__le__(*args, **kwargs)
+
+    # def __lt__(self, *args, **kwargs):
+    #     return self.__dict__.__lt__(*args, **kwargs)
+
 
 
     # String conversions
@@ -94,10 +102,7 @@ class dict:
 
     def __format__(self, *args, **kwargs):
         return self.__dict__.__format__(*args, **kwargs)
-
-    def __hash__(self, *args, **kwargs):
-        return self.__dict__.__hash__(*args, **kwargs)
-
+    
     def __init_subclass__(self, *args, **kwargs):
         return self.__dict__.__init_subclass__(*args, **kwargs)
 
@@ -223,7 +228,7 @@ class _DictTestCase(_unittest.TestCase):
         d = dict([("a", 1), ("b", 2)])
         self.assertEqual(d, {"a": 1, "b": 2})
         
-        
+
     # ----------> String conversions <----------
     def test_str(self):
         self.assertEqual(str(dict(first=1, second=2)), "{'first': 1, 'second': 2}")
