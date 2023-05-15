@@ -103,9 +103,6 @@ class dict:
     def __format__(self, *args, **kwargs):
         return self.__dict__.__format__(*args, **kwargs)
     
-    def __init_subclass__(self, *args, **kwargs):
-        return self.__dict__.__init_subclass__(*args, **kwargs)
-
     def __ior__(self, *args, **kwargs):
         return self.__dict__.__ior__(*args, **kwargs)
 
