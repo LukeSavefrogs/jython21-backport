@@ -4,13 +4,14 @@ class bool(int):
     """ Backport of the boolean values (`True` and `False`), which were introduced in Python 2.3. """
 
     def __init__(self, value):
-        # type: (int | str | list | dict | tuple) -> None
+        # type: (int | str | list | dict | tuple | bool) -> None
         """ Returns True when the argument x is true, False otherwise. The
         builtins True and False are the only two instances of the class bool.
         The class bool is a subclass of the class int, and cannot be subclassed.
         """
         if type(value) == type(5) or type(value) == type(1 == 1):
-            self.value = int(value) != 0
+            # -1 = True, 0 = False, 1 = True
+            self.value = int(int(value) != 0) # type: ignore
         elif type(value) in [type(""), type(u""), type([]), type(()), type({})]:
             if value:
                 self.value = 1
@@ -19,7 +20,7 @@ class bool(int):
         elif type(value) == type(None):
             self.value = 0
         elif type(value) == type(self):
-            self.value = value.value
+            self.value = int(value.value) # type: ignore
         else:
             raise TypeError("Type '%s' is not a valid boolean type" % type(value).__name__)
 
