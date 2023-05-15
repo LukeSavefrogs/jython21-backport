@@ -1,6 +1,6 @@
 import unittest as _unittest
 
-class bool(int):
+class bool:
     """ Backport of the boolean values (`True` and `False`), which were introduced in Python 2.3. """
 
     def __init__(self, value):
@@ -42,56 +42,80 @@ class bool(int):
 
     # Rich comparison methods
     def __eq__(self, other):
-        if type(other) == type(self):
-            return self.value == other.value
+        try:
+            if other.__class__ == self.__class__:
+                return self.value == other.value
+        except:
+            pass
         return self.value == other
     
     def __ne__(self, other):
-        if type(other) == type(self):
-            return self.value != other.value
+        try:
+            if other.__class__ == self.__class__:
+                return self.value != other.value
+        except:
+            pass
         return self.value != other
     
     def __lt__(self, other):
-        if type(other) == type(self):
-            return self.value < other.value
+        try:
+            if other.__class__ == self.__class__:
+                return self.value < other.value
+        except:
+            pass
         return self.value < other
     
     def __le__(self, other):
-        if type(other) == type(self):
-            return self.value <= other.value
+        try:
+            if other.__class__ == self.__class__:
+                return self.value <= other.value
+        except:
+            pass
         return self.value <= other
     
     def __gt__(self, other):
-        if type(other) == type(self):
-            return self.value > other.value
+        try:
+            if other.__class__ == self.__class__:
+                return self.value > other.value
+        except:
+            pass
         return self.value > other
     
     def __ge__(self, other):
-        if type(other) == type(self):
-            return self.value >= other.value
+        try:
+            if other.__class__ == self.__class__:
+                return self.value >= other.value
+        except:
+            pass
         return self.value >= other
 
     # Boolean operations
     def __and__(self, other):
-        if type(other) == type(self):
-            return type(self)(self.value and other.value)
-        
-        return type(self)(self.value and other)
+        try:
+            if other.__class__ == self.__class__:
+                return self.__class__(self.value and other.value)
+        except:
+            pass
+        return self.__class__(self.value and other)
     
     def __or__(self, other):
-        if type(other) == type(self):
-            return type(self)(self.value or other.value)
-        
-        return type(self)(self.value or other)
+        try:
+            if other.__class__ == self.__class__:
+                return self.__class__(self.value or other.value)
+        except:
+            pass
+        return self.__class__(self.value or other)
     
     def __xor__(self, other):
-        if type(other) == type(self):
-            return type(self)(self.value != other.value)
-        
-        return type(self)(self.value != other)
+        try:
+            if other.__class__ == self.__class__:
+                return self.__class__(self.value != other.value)
+        except:
+            pass
+        return self.__class__(self.value != other)
     
     def __invert__(self):
-        return type(self)(not self.value)
+        return self.__class__(not self.value)
 
 
 #! Jython 2.1 does not have boolean types (https://lukesavefrogs.github.io/wsadmin-type-hints/getting_started/tips-n-tricks/#workaround-for-jython-22-and-lower)
