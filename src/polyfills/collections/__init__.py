@@ -4,7 +4,7 @@ class OrderedDict:
     """ Drop-in replacement for the Python 2.7 OrderedDict class. """
     def __init__(self, d={}, **data):
         self._keys = []
-        self._values = []
+        self._values = [] # type: list
 
         if(type(d).__name__ not in ["dict", "org.python.core.PyDictionary"]):    # Fix for Jython types
             raise TypeError("the dictionary entered is not valid - either regular dictionary or OrderedDictionary object is expected")
@@ -113,7 +113,7 @@ class OrderedDict:
     
     def clear(self):
         self._keys = []
-        self._values = {}
+        self._values = []
         return None
     
     def get(self, key, default):
