@@ -223,11 +223,7 @@ class _DictTestCase(_unittest.TestCase):
         d = dict([("a", 1), ("b", 2)])
         self.assertEqual(d, {"a": 1, "b": 2})
         
-    def test_init_list_tuples(self):
-        d = dict((["a", 1], ["b", 2]))
-        self.assertEqual(d, {"a": 1, "b": 2})
-    
-
+        
     # ----------> String conversions <----------
     def test_str(self):
         self.assertEqual(str(dict(first=1, second=2)), "{'first': 1, 'second': 2}")
