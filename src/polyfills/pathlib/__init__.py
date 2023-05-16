@@ -23,10 +23,9 @@ class _Flavour:
     """A flavour implements a particular (platform-specific) set of path
     semantics."""  
 
-    def __init__(self):
-        self.join = self.sep.join
-
 class _WindowsFlavour(_Flavour):
+    """ Implements Windows path semantics. """
+
     # Reference for Windows paths can be found at
     # http://msdn.microsoft.com/en-us/library/aa365247%28v=vs.85%29.aspx
     name = "Windows"
@@ -43,6 +42,8 @@ class _WindowsFlavour(_Flavour):
     is_supported = (_os.name == 'nt')
     """ Wether the flavour is supported on the current platform. """
 class _PosixFlavour(_Flavour):
+    """ Implements Posix path semantics. """
+    
     name = "Posix"
     """ Name of the flavour. """
 
@@ -59,10 +60,15 @@ class _PosixFlavour(_Flavour):
 
 
 class Path:
+    """ Represents a path to a file or directory. 
+    
+    Polyfill for `pathlib.Path` for Jython.
+    """
     _path = ""
     _flavour = None
 
     def __init__(self, *args, **kwargs):
+        # Ensure the os module is always loaded, even if the class is copied
         exec("import os as _os")
         if _os.name == 'nt':
             self._flavour = _WindowsFlavour()
@@ -118,6 +124,9 @@ class Path:
 
         No normalization is done, i.e. all '.' and '..' will be kept along.
         Use resolve() to get the canonical path to a file.
+
+        Returns:
+            Path: A new 'Path' object with the absolute path.
         """
         parts = self._path.replace("\\", "/").split("/")
         if parts[-1].strip() == "":
@@ -133,6 +142,9 @@ class Path:
         """ Make the path absolute, resolving all symlinks on the way and also
         normalizing it (for example turning slashes into backslashes under
         Windows). 
+
+        Returns:
+            Path: A new 'Path' object with the resolved path.
         """
         return Path(_os.path.abspath(_os.path.normpath(self._path)))
     
@@ -184,29 +196,43 @@ class Path:
                 raise
 
     def read_bytes(self):
-        """
-        Open the file in bytes mode, read it, and close the file.
+        """ Open the file in bytes mode, read it, and close the file.
+
+        Returns:
+            bytes: The data read from the file.
         """
         return self._safe_read(self._path, mode='rb')
         
     def read_text(self, mode="r"):
-        """
-        Open the file in text mode, read it, and close the file.
+        """ Open the file in text mode, read it, and close the file.
+
+        Returns:
+            str: The data read from the file.
         """
         return self._safe_read(self._path, mode='r')
 
 
     def write_bytes(self, data):
+        """ Open the file in bytes mode, write to it, and close the file.
+
+        Args:
+            data (bytes): The data to write to the file.
+
+        Returns:
+            None: No return value.
         """
-        Open the file in bytes mode, write to it, and close the file.
-        """
-        return self._safe_write(self._path, data, mode="wb")
+        self._safe_write(self._path, data, mode="wb")
 
     def write_text(self, data):
+        """ Open the file in text mode, write to it, and close the file.
+
+        Args:
+            data (str): The data to write to the file.
+
+        Returns:
+            None: No return value.
         """
-        Open the file in text mode, write to it, and close the file.
-        """
-        return self._safe_write(self._path, data, mode="w")
+        self._safe_write(self._path, data, mode="w")
 
 
     def _safe_read(self, filename, mode="r"):
