@@ -6,7 +6,8 @@ wsadmin>dir(os.path)
 ```
 """
 import os as _os
-import unittest
+import glob as _glob
+import unittest as _unittest
 
 try:
     from pathlib import Path as _Path
@@ -18,17 +19,56 @@ else:
 
 __all__ = ["Path"]
 
+class _Flavour:
+    """A flavour implements a particular (platform-specific) set of path
+    semantics."""  
+
+    def __init__(self):
+        self.join = self.sep.join
+
+class _WindowsFlavour(_Flavour):
+    # Reference for Windows paths can be found at
+    # http://msdn.microsoft.com/en-us/library/aa365247%28v=vs.85%29.aspx
+    name = "Windows"
+    """ Name of the flavour. """
+
+    sep = '\\'
+    """ Path separator. """
+
+    altsep = '/'
+    """ Alternate pathname separator. """
+
+    has_drv = 1 == 1
+
+    is_supported = (_os.name == 'nt')
+    """ Wether the flavour is supported on the current platform. """
+class _PosixFlavour(_Flavour):
+    name = "Posix"
+    """ Name of the flavour. """
+
+    sep = '/'
+    """ Path separator. """
+
+    altsep = ''
+    """ Alternate pathname separator. """
+
+    has_drv = 1 == 0
+
+    is_supported = (_os.name != 'nt')
+    """ Wether the flavour is supported on the current platform. """ 
+
+
 class Path:
     _path = ""
-    _class_type = "" # valid types: Posix | Windows
+    _flavour = None
 
     def __init__(self, *args, **kwargs):
         exec("import os as _os")
         if _os.name == 'nt':
-            self._class_type = "Windows"
+            self._flavour = _WindowsFlavour()
             self._path = _os.path.join(*args).replace("/", "\\")
         else:
-            self._class_type = "Posix"
+            self._flavour = _PosixFlavour()
             self._path = _os.path.join(*args)
         
         if self._path.replace("\\", "/").startswith("./"):
@@ -38,7 +78,7 @@ class Path:
         return str(self._path)
     
     def __repr__(self):
-        return "%s('%s')" % (self._class_type + "Path", str(self._path).replace("\\", "/"))
+        return "%s('%s')" % (self._flavour.name + "Path", str(self._path).replace("\\", "/"))
     
     def __div__(self, other):
         if str(self) == ".":
@@ -64,6 +104,14 @@ class Path:
         
         return Path(str(other), str(self))
     
+    def as_posix(self):
+        """ Return the string representation of the path with forward slashes (`/`).
+        
+        Returns:
+            str: The string representation of the path with forward slashes (`/`).
+        """
+        return str(self).replace(self._flavour.sep, '/')
+
     def absolute(self):
         """Return an absolute version of this path.  This function works
         even if the path doesn't point to anything.
@@ -90,12 +138,35 @@ class Path:
     
     # WORKS
     def expanduser(self):
+        """ Expand ~ and ~user constructions. If user or $HOME is unknown, do nothing. 
+
+        Returns:
+            Path: A new 'Path' object with the expanded user path.
+        """        
         return Path(_os.path.expanduser(self._path))
 
     # WORKS
     def exists(self):
-        """ Whether this path exists. """
+        """ Whether this path exists.
+
+        Returns:
+            bool: True if the path exists, False otherwise. 
+        """
         return _os.path.exists(str(Path(self._path).resolve()))
+
+    def glob(self, pattern):
+        """ Iterate over this subtree and yield all existing files (of any
+        kind, including directories) matching the given relative pattern.
+
+        Args:
+            pattern (str): The pattern to match against.
+
+        Returns:
+            list: A list of 'Path' objects matching the pattern.
+        """
+        pattern = Path(self._path).resolve() / pattern
+        
+        return _glob.glob(pattern)
     
     def unlink(self):
         _os.remove(str(Path(self._path).resolve()))
@@ -173,7 +244,7 @@ class Path:
                 pass
 
 
-class PathTestCase(unittest.TestCase):
+class PathTestCase(_unittest.TestCase):
     def test_creation(self):
         self.assertEqual(str(Path("/", "tmp", "", "test.py")), "%stmp%stest.py" % (_os.sep, _os.sep))
         self.assertEqual(str(Path("/tmp/test.py")), "%stmp%stest.py" % (_os.sep, _os.sep))
@@ -217,14 +288,14 @@ class PathTestCase(unittest.TestCase):
 if __name__ == "__main__":
     _globals = globals()
 
-    # Retrieve all the classes in the current file which are subclasses of `unittest.TestCase`.
+    # Retrieve all the classes in the current file which are subclasses of `_unittest.TestCase`.
     # Type `type` is necessary when developing with Python3 since all new-type classes have type `type` (search `<class 'type'>`)
     test_cases = [
         _globals[symbol]
         for symbol in _globals.keys()
         if type(_globals[symbol]).__name__
         in ["class", "type", "org.python.core.PyClass"]
-        and issubclass(_globals[symbol], unittest.TestCase)
+        and issubclass(_globals[symbol], _unittest.TestCase)
     ]
 
     # Find all the test methods from the classes found before and initialize the TestCase classes with those methods
@@ -236,8 +307,8 @@ if __name__ == "__main__":
         # and "showall" in test_method
     ]
 
-    suite = unittest.TestSuite(tests)
-    runner = unittest.TextTestRunner()
+    suite = _unittest.TestSuite(tests)
+    runner = _unittest.TextTestRunner()
 
     # Start the tests
     runner.run(suite)
