@@ -168,8 +168,20 @@ class Path:
         
         return _glob.glob(pattern)
     
-    def unlink(self):
-        _os.remove(str(Path(self._path).resolve()))
+    def unlink(self, missing_ok=1==0):
+        """ Remove this file or link.  If the path is a directory, use rmdir() instead. 
+        
+        Raises:
+            OSError: If the path is a directory and `missing_ok` is False.
+            
+        Returns:
+            None: No return value.
+        """
+        try:
+            _os.remove(str(Path(self._path).resolve()))
+        except FileNotFoundError:
+            if not missing_ok:
+                raise
 
     def read_bytes(self):
         """
