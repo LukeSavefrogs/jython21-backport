@@ -42,7 +42,7 @@ class _WindowsFlavour(_Flavour):
 
     is_supported = (_os.name == 'nt')
     """ Wether the flavour is supported on the current platform. """
-    
+
 class _PosixFlavour(_Flavour):
     """ Implements Posix path semantics. """
     
@@ -144,10 +144,21 @@ class Path(Base):
             return _os.path.basename(str(self))
         
         elif name == "stem":     # Return the name of the file
+            """ Return the final path component, without its suffix, if any.
+            CPython 3.9.6:
+            >>> os.path.splitext("..")
+            ('..', '')
+
+            Jython 2.1:
+            >>> os.path.splitext("..")
+            ('.', '.')
+            """
             basename = _os.path.basename(str(self))
             
             if basename == ".":
                 return ""
+            elif basename == "..":
+                return ".."
             
             return _os.path.splitext(basename)[0]
         
