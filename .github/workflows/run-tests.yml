@@ -54,7 +54,7 @@ jobs:
             python-version: ${{ matrix.python_version }}
       - name: "Install dependencies"
         run: |
-            pip install -e ./src/
+            pip install -e ./
       - name: "Run tests"
         run: |
             python -m unittest discover ./src/
