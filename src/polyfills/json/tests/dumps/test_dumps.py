@@ -80,13 +80,38 @@ class ObjectTestCase(unittest.TestCase):
         self.assertEqual(
             json.dumps({
                 "string": "value",
+            }), 
+            '{"string": "value"}'
+        )
+        self.assertEqual(
+            json.dumps({
                 "string_too": "2",
+            }), 
+            '{"string_too": "2"}'
+        )
+        self.assertEqual(
+            json.dumps({
                 "boolean": True,
+            }), 
+            '{"boolean": true}'
+        )
+        self.assertEqual(
+            json.dumps({
                 "integer": 14,
+            }), 
+            '{"integer": 14}'
+        )
+        self.assertEqual(
+            json.dumps({
                 "float": 27.3,
+            }), 
+            '{"float": 27.3}'
+        )
+        self.assertEqual(
+            json.dumps({
                 "null": None,
             }), 
-            '{"string": "value", "string_too": "2", "boolean": true, "integer": 14, "float": 27.3, "null": null}'
+            '{"null": null}'
         )
 
 
