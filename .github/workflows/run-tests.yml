@@ -76,7 +76,7 @@ jobs:
         run: |
             curl -O https://bootstrap.pypa.io/pip/2.7/get-pip.py
             python get-pip.py
-            python -m pip install --upgrade "pip < 21.0"
+            python -m pip install --no-cache-dir --upgrade "pip < 21.0"
         
       - name: "Set up Python ${{ matrix.python_version }}"
         uses: actions/setup-python@v4
