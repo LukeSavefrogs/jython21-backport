@@ -77,42 +77,20 @@ class ObjectTestCase(unittest.TestCase):
         )
 
     def test_complex(self):
-        self.assertEqual(
-            json.dumps({
-                "string": "value",
-            }), 
-            '{"string": "value"}'
-        )
-        self.assertEqual(
-            json.dumps({
-                "string_too": "2",
-            }), 
-            '{"string_too": "2"}'
-        )
-        self.assertEqual(
-            json.dumps({
-                "boolean": True,
-            }), 
-            '{"boolean": true}'
-        )
-        self.assertEqual(
-            json.dumps({
-                "integer": 14,
-            }), 
-            '{"integer": 14}'
-        )
-        self.assertEqual(
-            json.dumps({
-                "float": 27.3,
-            }), 
-            '{"float": 27.3}'
-        )
-        self.assertEqual(
-            json.dumps({
-                "null": None,
-            }), 
-            '{"null": null}'
-        )
+        dump = json.dumps({
+			"string": "value",
+			"string_too": "2",
+			"boolean": True,
+			"integer": 14,
+			"float": 27.3,
+			"null": None,
+		})
+        assert '"string": "value"' in dump
+        assert '"string_too": "2"' in dump
+        assert '"boolean": true' in dump
+        assert '"integer": 14' in dump
+        assert '"float": 27.3' in dump
+        assert '"null": null' in dump
 
 
 if __name__ == '__main__':
