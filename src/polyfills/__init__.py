@@ -1,3 +1,9 @@
+""" This package provides polyfills for features that will be added in newer Python versions.
+
+The polyfills are organized in subpackages, each one containing the polyfills for a specific
+Python module. For example, the `src.polyfills.stdlib.pathlib` package contains the
+polyfills for the `pathlib` module.
+"""
 import sys
 import os
 
@@ -13,7 +19,7 @@ def is_jython():
 
     # Method 1: Check if the `java` package is installed
     try:
-        import java  # pyright: ignore[reportMissingImports]
+        import java  # type: ignore
     except ImportError:
         return _false
 
