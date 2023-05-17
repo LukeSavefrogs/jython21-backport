@@ -11,12 +11,19 @@ Implemented mostly by using native `os.path` calls to mimic the behaviour of the
 - Same output for both `str(...)` and `repr(...)`
 - Subset of **methods** from the original `Path`:
   - `.absolute()`
-  - `.resolve()`
+  - `.as_posix()`
   - `.expanduser()`
   - `.exists()`
-  - `.unlink()`
+  - `.glob()`
+  - `.resolve()`
   - `.read_bytes()` and `.read_text()`
   - `.write_bytes()` and `.write_text()`
+  - `.unlink()`
+- Subset of **properties** from the original `Path`:
+  - `.name`
+  - `.parent`
+  - `.stem`
+  - `.suffix`
 
 ## Usage
 

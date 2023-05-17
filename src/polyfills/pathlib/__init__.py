@@ -7,6 +7,7 @@ wsadmin>dir(os.path)
 """
 import os as _os
 import glob as _glob
+import time
 import unittest as _unittest
 
 try:
@@ -41,6 +42,7 @@ class _WindowsFlavour(_Flavour):
 
     is_supported = (_os.name == 'nt')
     """ Wether the flavour is supported on the current platform. """
+    
 class _PosixFlavour(_Flavour):
     """ Implements Posix path semantics. """
     
@@ -58,8 +60,10 @@ class _PosixFlavour(_Flavour):
     is_supported = (_os.name != 'nt')
     """ Wether the flavour is supported on the current platform. """ 
 
+class Base:
+    pass
 
-class Path:
+class Path(Base):
     """ Represents a path to a file or directory. 
     
     Polyfill for `pathlib.Path` for Jython.
@@ -79,6 +83,15 @@ class Path:
         
         if self._path.replace("\\", "/").startswith("./"):
             self._path = self._path[2:]
+
+        # Remove the final path if it references the current folder
+        if self._path.replace("\\", "/").endswith("/."):
+            self._path = self._path[:-2]
+
+        # Remove excess trailing slashes, except when the path is the root
+        while self._path.replace("\\", "/").endswith("/") and self._path.replace("\\", "/") not in ["/", "//"]:
+            self._path = self._path[:-1]
+
         
     def __str__(self):
         return str(self._path)
@@ -109,6 +122,46 @@ class Path:
             return Path(str(self))
         
         return Path(str(other), str(self))
+    
+    # The `__getattribute__` magic method is not present in Python 2.1
+    def __getattr__(self, name):
+        """ `__getattr__` gets called every time an undefined attribute is accessed. 
+        
+        We use this to implement the `parent`, `name`, `stem` and `suffix` properties.
+
+        Args:
+            name (str): The name of the attribute to get.
+        """
+        if name == "parent":
+            # `.` and `..` are actually children of the current folder (`.`)
+            if self.as_posix() in [".", ".."]:
+                return Path(".")
+            
+            parent_folder = _os.path.dirname(str(self))
+            return Path(parent_folder)
+        
+        elif name == "name":
+            return _os.path.basename(str(self))
+        
+        elif name == "stem":     # Return the name of the file
+            basename = _os.path.basename(str(self))
+            
+            if basename == ".":
+                return ""
+            
+            return _os.path.splitext(basename)[0]
+        
+        elif name == "suffix":   # Return the extension of the file
+            basename = _os.path.basename(str(self))
+            suffix = Path(basename).as_posix().split("/")[-1]
+            
+            if suffix in [".", ".."]:
+                return ""
+            
+            return _os.path.splitext(basename)[1]
+        
+        else:
+            return Base.__getattr__(self, name)
     
     def as_posix(self):
         """ Return the string representation of the path with forward slashes (`/`).
@@ -307,6 +360,12 @@ class PathTestCase(_unittest.TestCase):
             self.assertEqual(repr(Path("/tmp/test")), repr(_Path("/tmp/test")))
             self.assertEqual(repr(Path("./sub_dir/file.txt")), repr(_Path("./sub_dir/file.txt")))
 
+    def test_method_str(self):
+        self.assertEqual(str(Path("/tmp").as_posix()), "/tmp")
+        self.assertEqual(str(Path("/tmp/").as_posix()), "/tmp")
+        self.assertEqual(str(Path("/tmp/file.py").as_posix()), "/tmp/file.py")
+        self.assertEqual(str(Path("/tmp/file.py//").as_posix()), "/tmp/file.py")
+
     def test_method_expanduser(self):
         if "HOME" in _os.environ.keys():
             self.assertEqual(str(Path("~").expanduser()), _os.environ["HOME"])
@@ -321,7 +380,57 @@ class PathTestCase(_unittest.TestCase):
         self.assertEqual(Path("..").exists(), 1 == 1)
         self.assertEqual(Path("/should/not/exist").exists(), 1 == 0)
         self.assertEqual(Path("~").expanduser().exists(), 1 == 1)
-        
+
+    def test_property_parent(self):
+        self.assertEqual(Path(".").parent.as_posix(), ".")
+        self.assertEqual(Path("..").parent.as_posix(), ".")
+        self.assertEqual(Path("/tmp").parent.as_posix(), "/")
+        self.assertEqual(Path("/tmp/test").parent.as_posix(), "/tmp")
+        self.assertEqual(Path("/tmp/test/").parent.as_posix(), "/tmp")
+        self.assertEqual(Path("/tmp/test/.").parent.as_posix(), "/tmp")
+        self.assertEqual(Path("/tmp/test/..").parent.as_posix(), "/tmp/test")
+        self.assertEqual(Path("/tmp/test/../").parent.as_posix(), "/tmp/test")
+
+    def test_property_name(self):
+        self.assertEqual(str(Path(".").name), ".")
+        self.assertEqual(str(Path("..").name), "..")
+        self.assertEqual(str(Path("/tmp").name), "tmp")
+        self.assertEqual(str(Path("/tmp/test").name), "test")
+        self.assertEqual(str(Path("/tmp/test/").name), "test")
+        self.assertEqual(str(Path("/tmp/test/..").name), "..")
+        self.assertEqual(str(Path("/tmp/test/../").name), "..")
+        self.assertEqual(str(Path("/tmp/test/.").name), "test")
+
+    def test_property_stem(self):
+        self.assertEqual(str(Path(".").stem), "")
+        self.assertEqual(str(Path("..").stem), "..")
+        self.assertEqual(str(Path("/tmp").stem), "tmp")
+        self.assertEqual(str(Path("/tmp/test").stem), "test")
+        self.assertEqual(str(Path("/tmp/test/").stem), "test")
+        self.assertEqual(str(Path("/tmp/test/..").stem), "..")
+        self.assertEqual(str(Path("/tmp/test/../").stem), "..")
+        self.assertEqual(str(Path("/tmp/test/.").stem), "test")
+    
+    def test_property_suffix(self):
+        self.assertEqual(str(Path(".").suffix), "")
+        self.assertEqual(str(Path("..").suffix), "")
+        self.assertEqual(str(Path("/tmp").suffix), "")
+        self.assertEqual(str(Path("/tmp/test").suffix), "")
+        self.assertEqual(str(Path("/tmp/test/").suffix), "")
+        self.assertEqual(str(Path("/tmp/test/..").suffix), "")
+        self.assertEqual(str(Path("/tmp/test/../").suffix), "")
+        self.assertEqual(str(Path("/tmp/test/.").suffix), "")
+        self.assertEqual(str(Path("/tmp/test.txt").suffix), ".txt")
+        self.assertEqual(str(Path("/tmp/test.txt/").suffix), ".txt")
+        self.assertEqual(str(Path("/tmp/test.txt/..").suffix), "")
+        self.assertEqual(str(Path("/tmp/test.txt/../").suffix), "")
+        self.assertEqual(str(Path("/tmp/test.txt/.").suffix), ".txt")
+        self.assertEqual(str(Path("/tmp/test.txt.tar.gz").suffix), ".gz")
+        self.assertEqual(str(Path("/tmp/test.txt.tar.gz/").suffix), ".gz")
+        self.assertEqual(str(Path("/tmp/test.txt.tar.gz/..").suffix), "")
+        self.assertEqual(str(Path("/tmp/test.txt.tar.gz/../").suffix), "")
+        self.assertEqual(str(Path("/tmp/test.txt.tar.gz/.").suffix), ".gz")
+
 
 if __name__ == "__main__":
     _globals = globals()
