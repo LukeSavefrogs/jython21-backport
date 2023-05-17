@@ -72,16 +72,18 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@v2
 
-      - name: "Install pip"
-        run: |
-            curl -O https://bootstrap.pypa.io/pip/2.7/get-pip.py
-            python get-pip.py
-            python -m pip install --no-cache-dir --upgrade "pip < 21.0"
+    #   - name: "Install pip"
+    #     run: |
+    #         curl -O https://bootstrap.pypa.io/pip/2.7/get-pip.py
+    #         python get-pip.py
+    #         python -m pip install --no-cache-dir --upgrade "pip < 21.0"
         
       - name: "Set up Python ${{ matrix.python_version }}"
         uses: actions/setup-python@v4
         with:
             python-version: ${{ matrix.python_version }}
+            check-latest: false
+            cache-dependency-path: ~/.cache/pip2
         
       - name: "Run tests"
         run: |
