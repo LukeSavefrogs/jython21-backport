@@ -18,9 +18,33 @@ jobs:
         max-parallel: 4
         matrix:
             os: [ubuntu-20.04, windows-latest]
-            # exclude:
-            #   - os: windows-latest
-            #     python_version: "2.7.17"
+            # Exclude Python versions that are not supported on the OS
+            exclude:
+              - os: ubuntu-20.04
+                python_version: "3.0.1"
+              - os: ubuntu-20.04
+                python_version: "3.2.5"
+              - os: ubuntu-20.04
+                python_version: "3.3.5"
+              - os: ubuntu-20.04
+                python_version: "3.3.7"
+              - os: ubuntu-20.04
+                python_version: "3.4.4"
+              - os: ubuntu-20.04
+                python_version: "3.4.10"
+                
+              - os: windows-latest
+                python_version: "3.3.7"
+              - os: windows-latest
+                python_version: "3.4.10"
+              - os: windows-latest
+                python_version: "3.5.10"
+              - os: windows-latest
+                python_version: "3.6.15"
+              - os: windows-latest
+                python_version: "3.7.16"
+              - os: windows-latest
+                python_version: "3.8.16"
             python_version: 
                 - "2.7.17"
                 - "2.7.18"
@@ -47,6 +71,7 @@ jobs:
     steps:
       - name: "Checkout"
         uses: actions/checkout@v2
+
       - name: "Install pip"
         run: |
             curl -O https://bootstrap.pypa.io/pip/2.7/get-pip.py
@@ -57,6 +82,7 @@ jobs:
         uses: actions/setup-python@v4
         with:
             python-version: ${{ matrix.python_version }}
+        
       - name: "Run tests"
         run: |
             python -m unittest discover ./src/
