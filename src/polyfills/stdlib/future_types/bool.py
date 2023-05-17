@@ -1,5 +1,7 @@
 import unittest as _unittest
 
+__all__ = ["bool"]
+
 class bool:
     """ Backport of the boolean values (`True` and `False`), which were introduced in Python 2.3. """
 
@@ -118,8 +120,15 @@ class bool:
         return self.__class__(not self.value)
 
 
-#! Jython 2.1 does not have boolean types (https://lukesavefrogs.github.io/wsadmin-type-hints/getting_started/tips-n-tricks/#workaround-for-jython-22-and-lower)
-exec("try: (True, False)\nexcept NameError: exec('True = bool(1); False = bool(0)')")
+# Locally, `True` and `False` are never redefined, since they are keywords.
+try:
+    (True, False)
+except NameError:
+    exec('True = bool(1); False = bool(0)')
+
+    # Add `True` and `False` to the list of exported names.
+    __all__ = ["bool", "True", "False"]
+
 
 class _BooleanTestCase(_unittest.TestCase):
     """ Unit tests for the boolean type. """
