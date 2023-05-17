@@ -1,3 +1,67 @@
+""" Backport of the boolean values (`True` and `False`), which were introduced in Python 2.3.
+
+This module exports three objects:
+
+    - `bool` is the class of the boolean values `True` and `False`; can also 
+        be used to cast expressions to their boolean type.
+    - `True` is the boolean value `True`.
+    - `False` is the boolean value `False`.
+
+
+### `bool` class
+
+The class `bool` can be used to:
+1. cast an expression to a boolean type
+2. create a boolean value from a string, list, tuple, dictionary, boolean or integer
+3. check if an object is a boolean value
+
+#### 1. Casting an expression to a boolean type
+
+    >>> import os
+    >>> is_win = bool(os.name == "nt")
+    >>> is_win
+    True
+
+#### 2. Creating a boolean value from a string, list, tuple, dictionary, boolean or integer
+
+    >>> bool("Hello")
+    True
+    >>> bool("")
+    False
+    >>> bool([1, 2, 3])
+    True
+    >>> bool([])
+    False
+    >>> bool((1, 2, 3))
+    True
+    >>> bool(())
+    False
+    >>> bool({"a": 1, "b": 2})
+    True
+    >>> bool({})
+    False
+    >>> bool(True)
+    True
+    >>> bool(False)
+    False
+    >>> bool(-4)
+    True
+    >>> bool(0)
+    False
+
+#### 3. Checking if an object is a boolean value
+
+    >>> isinstance(True, bool)
+    1
+    >>> isinstance(False, bool)
+    1
+    >>> isinstance(1, bool)
+    0
+    >>> isinstance(0, bool)
+    0
+    >>> isinstance("Hello", bool)
+    0
+"""
 import unittest as _unittest
 
 __all__ = ["bool"]
