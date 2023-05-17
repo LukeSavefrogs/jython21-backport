@@ -1,5 +1,7 @@
 # Jython 2.1 backporting
 
+[![CPython tests](https://github.com/LukeSavefrogs/jython21-backport/actions/workflows/run-tests.yml/badge.svg)](https://github.com/LukeSavefrogs/jython21-backport/actions/workflows/run-tests.yml)
+
 Collection of features present in **newer Python** versions (`v2.x`, `v3.x`) backported to **legacy Python versions** (tested down to `v2.1`).
 
 Supported Python implementation:
