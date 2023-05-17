@@ -20,8 +20,55 @@ This package provides backporting for the following features:
 
 ## Tests
 
-To run tests use the following command:
+After performing a change to a module it's best practice to **always run tests** and update those failing (or add some if it's a new feature).
+
+### All repository
+
+To run all the tests in this repository use the following command:
 
 ```shell
 poetry run python -m unittest discover ./src/
+```
+
+You can test single files using the following commands:
+
+### Single module
+
+#### Locally
+
+When developing using `poetry` use the following command:
+
+```shell
+poetry run python /path/to/module.py
+```
+
+For example:
+
+```shell
+(polyfills-py3.9) → ~\polyfills › poetry run python .\src\polyfills\pathlib\__init__.py
+..........
+----------------------------------------------------------------------
+Ran 10 tests in 0.004s
+
+OK
+```
+
+#### Remotely
+
+To run tests on a host running the Websphere Application Server Jython console (`wsadmin.sh`) run the following command:
+
+```shell
+/path/to/profile/bin/wsadmin.sh -lang jython -f /path/to/module.py
+```
+
+For example:
+
+```shell
+username@hostname ~ $ /opt/Websphere/MyCell/profiles/dmgr/bin/wsadmin.sh -lang jython -f /src/polyfills/pathlib/__init__.py
+WASX7209I: Connected to process "dmgr" on node MyNode using SOAP connector;  The type of process is: DeploymentManager
+..........
+----------------------------------------------------------------------
+Ran 10 tests in 0.068s
+
+OK
 ```
