@@ -1,6 +1,6 @@
-name: "Run tests"
+name: "CPython tests"
 
-run-name: "Run tests"
+run-name: "Run CPython tests"
 
 on:
   push:
