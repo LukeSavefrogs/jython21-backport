@@ -21,18 +21,20 @@ jobs:
     strategy:
         fail-fast: false
         matrix:
-            os: [ubuntu-20.04, windows-latest]
-            python_version: 
-                - "2.7.3"
+            os: 
+                - ubuntu-latest
+                # - windows-latest
+            jython_version: 
+                # - "2.7.3"
                 - "2.7.2"
-                - "2.7.1"
-                - "2.7.0"
-                - "2.5.3"
-                - "2.5.2"
-                - "2.5.1"
-                - "2.5.0"
-                - "2.2.1"
-                - "2.2"
+                # - "2.7.1"
+                # - "2.7.0"
+                # - "2.5.3"
+                # - "2.5.2"
+                # - "2.5.1"
+                # - "2.5.0"
+                # - "2.2.1"
+                # - "2.2"
 
     runs-on: ${{ matrix.os }}
     defaults:
@@ -53,8 +55,8 @@ jobs:
     - name: Determine Jython installer URL
       id: jython_installer_url
       run: |
-        url_maven="https://repo1.maven.org/maven2/org/python/jython-installer/${{ matrix.python_version }}/jython-installer-${{ matrix.python_version }}.jar";
-        url_sourceforge="https://master.dl.sourceforge.net/project/jython/jython/${{ matrix.python_version }}/jython_installer-${{ matrix.python_version }}.jar?viasf=1";
+        url_maven="https://repo1.maven.org/maven2/org/python/jython-installer/${{ matrix.jython_version }}/jython-installer-${{ matrix.jython_version }}.jar";
+        url_sourceforge="https://master.dl.sourceforge.net/project/jython/jython/${{ matrix.jython_version }}/jython_installer-${{ matrix.jython_version }}.jar?viasf=1";
         
         printf "Testing:\n"
         printf -- "- Maven      : %s\n" "${url_maven}";
@@ -77,10 +79,37 @@ jobs:
     
     - name: Install Jython
       run: |
+            # Installation types:
+            # - all       : everything (including src)
+            # - standard  : core, mod, demo, doc, ensurepip
+            #               standard is the default
+            # - minimum   : core
+            # - standalone: install a single, executable .jar,
+            #               containing all the modules
+            #
+            # Note - standalone installation may fail with the following stacktrace (tested on 2.7.2):1
+            # org.python.util.install.InstallerException: Error accessing jar file
+            #     at org.python.util.install.JarInstaller.inflate(JarInstaller.java:177)
+            #     at org.python.util.install.ConsoleInstaller.install(ConsoleInstaller.java:66)
+            #     at org.python.util.install.Installation.internalMain(Installation.java:389)
+            #     at org.python.util.install.Installation.main(Installation.java:43)
+            # Caused by: java.util.zip.ZipException: duplicate entry: module-info.class
+            #     at java.util.zip.ZipOutputStream.putNextEntry(ZipOutputStream.java:232)
+            #     at java.util.jar.JarOutputStream.putNextEntry(JarOutputStream.java:109)
+            #     at org.python.util.install.StandalonePackager.addJarFile(StandalonePackager.java:92)
+            #     at org.python.util.install.JarInstaller.inflate(JarInstaller.java:163)
+            #     ... 3 more
+
+            # This is why I use the standard installation
+            # java -jar /tmp/jython_installer.jar \
+            #     --silent \
+            #     --directory ~/jython/ \
+            #     --type standalone;
+
             java -jar /tmp/jython_installer.jar \
                 --silent \
                 --directory ~/jython/ \
-                --type standalone;
+                --type standard;
     
     - name: Run Jython
       run: |
