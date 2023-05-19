@@ -2,22 +2,18 @@ name: "CPython tests"
 
 run-name: "Run CPython tests"
 
-on:
-  push:
-    # branches: [ master ]
-  pull_request:
-    # branches: [ master ]
+on: [push, pull_request]
 
 jobs:
   test:
     name: "Test"
-    # concurrency:
-    #   group: "test-${{ matrix.os }}"
     strategy:
       fail-fast: false
       # max-parallel: 6
       matrix:
-        os: [ubuntu-20.04, windows-latest]
+        os: 
+          - ubuntu-20.04
+          - windows-latest
         python_version: 
           - "2.7.17"
           - "2.7.18"
@@ -73,12 +69,6 @@ jobs:
     steps:
       - name: "Checkout"
         uses: actions/checkout@v2
-
-    #   - name: "Install pip"
-    #     run: |
-    #       curl -O https://bootstrap.pypa.io/pip/2.7/get-pip.py
-    #       python get-pip.py
-    #       python -m pip install --no-cache-dir --upgrade "pip < 21.0"
         
       - name: "Set up Python ${{ matrix.python_version }}"
         uses: actions/setup-python@v4
