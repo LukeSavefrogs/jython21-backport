@@ -60,7 +60,6 @@ jobs:
         with:
           python-version: ${{ matrix.python_version }}
           check-latest: false
-          cache-dependency-path: ~/.cache/pip2
         
       - name: "Run tests"
         run: |
