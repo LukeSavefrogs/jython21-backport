@@ -28,13 +28,14 @@ def discover_tests(package='src'):
 			file_path = os.path.join(root, file)
 
 			# Check if file contains at least one Test Case class
-			with open(file_path, 'r') as f:
-				contents = f.read()
-				contains_test_case = re.search('^\s*class (Test.*?|.*?TestCase\s*)\(.*?\.TestCase\)\s*:\s*(#.*)?$', contents, re.MULTILINE)
-				
-				if contains_test_case:
-					file_in_package = file_path[len(package_directory) + 1:][:-3]
-					test_files.append(package_name + "." + file_in_package.replace(os.sep, '.'))
+			f = open(file_path, 'r')
+			contents = f.read()
+			f.close()
+			contains_test_case = re.search('^\s*class (Test.*?|.*?TestCase\s*)\(.*?\.TestCase\)\s*:\s*(#.*)?$', contents, re.MULTILINE)
+			
+			if contains_test_case:
+				file_in_package = file_path[len(package_directory) + 1:][:-3]
+				test_files.append(package_name + "." + file_in_package.replace(os.sep, '.'))
 
 	return test_files
 
