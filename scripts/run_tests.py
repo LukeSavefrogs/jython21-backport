@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 
 import unittest
 
@@ -41,8 +42,15 @@ def discover_tests(package='src'):
 if __name__ == '__main__':
 	test_files = discover_tests()
 
+	# Add the package path to the PYTHONPATH
+	# package_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src')
+	package_path = "./src/"
+	sys.path.append(package_path)
+
 	print("Found %d test files:" % len(test_files))
 	print('\n'.join(["- " + file for file in test_files]) + '\n')
 
 	suite = unittest.TestLoader().loadTestsFromNames(test_files)
-	unittest.TextTestRunner(verbosity=2).run(suite)
+	test_result = unittest.TextTestRunner(verbosity=2).run(suite)
+
+	sys.exit(not test_result.wasSuccessful())
