@@ -187,7 +187,7 @@ class dict:
         return self.__dict__.update(*args, **kwargs)
 
     def values(self):
-        """ Return a list of the dictionary’s values.
+        """ Return a list of the dictionary's values.
 
         In Python 3.x `dict.values()` returns a view object, while in Python 2.x it returns a list.
 
