@@ -51,4 +51,4 @@ jobs:
 
       - name: Run Jython
         run: |
-          jython ./scripts/run_tests.py
+          jython ./scripts/run_tests.py --verbose
