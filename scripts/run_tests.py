@@ -87,9 +87,16 @@ def detect_package_folder(current_directory=os.getcwd()):
 
     Args:
         current_directory (str): The current working directory.
+    
+    Returns:
+        str: The path to the package root.
     """
     if current_directory is None:
         current_directory = os.getcwd()
+    elif not os.path.isdir(current_directory):
+        raise Exception("Not a directory: %s" % current_directory)
+    elif not os.path.exists(current_directory):
+        raise Exception("Directory does not exist: %s" % current_directory)
 
     # Traverse upwards until we find the FIRST directory containing an __init__.py file
     previous_directory = None
