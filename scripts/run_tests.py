@@ -137,7 +137,7 @@ if __name__ == "__main__":
 
 
     # Add the package path to the PYTHONPATH so that tests can import the package
-    sys.path.append(package_path)
+    sys.path.append(os.path.dirname(package_path))
 
     # Run the tests
     suite = unittest.TestLoader().loadTestsFromNames(test_files)
