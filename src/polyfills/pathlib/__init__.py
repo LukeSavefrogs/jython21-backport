@@ -361,6 +361,12 @@ class PathTestCase(_unittest.TestCase):
             self.assertEqual(str(Path("./..")), str(_Path("./..")))
             self.assertEqual(str(Path("../..")), str(_Path("../..")))
 
+    def test_method_as_posix(self):
+        self.assertEqual(Path("/tmp/file.txt").as_posix(), "/tmp/file.txt")
+        self.assertEqual(Path("\\tmp\\file.txt").as_posix(), "/tmp/file.txt")
+        self.assertEqual(Path("C:\\Users\\MyUser\\Desktop").as_posix(), "C:/Users/MyUser/Desktop")
+        self.assertEqual(Path("\\Path\\To\\Resource").as_posix(), "/Path/To/Resource")
+
     def test_method_repr(self):
         assert repr(Path(".")).endswith("Path('.')")
         assert repr(Path("/tmp/test")).endswith("Path('/tmp/test')")
@@ -370,7 +376,7 @@ class PathTestCase(_unittest.TestCase):
             self.assertEqual(repr(Path(".")), repr(_Path(".")))
             self.assertEqual(repr(Path("/tmp/test")), repr(_Path("/tmp/test")))
             self.assertEqual(repr(Path("./sub_dir/file.txt")), repr(_Path("./sub_dir/file.txt")))
-
+    
     def test_method_str(self):
         self.assertEqual(str(Path("/tmp").as_posix()), "/tmp")
         self.assertEqual(str(Path("/tmp/").as_posix()), "/tmp")
