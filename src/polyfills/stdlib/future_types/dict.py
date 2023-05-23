@@ -287,7 +287,7 @@ class _DictTestCase(_unittest.TestCase):
         d = dict(first=1, second=2)
         items = list(d.items())
         items.sort()
-        self.assertEqual(list(d.items()), [("first", 1), ("second", 2)])
+        self.assertEqual(items, [("first", 1), ("second", 2)])
 
     def test_keys(self):
         d = dict(first=1, second=2)
