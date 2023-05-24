@@ -1,7 +1,7 @@
 """ This package provides polyfills for features that will be added in newer Python versions.
 
 The polyfills are organized in subpackages, each one containing the polyfills for a specific
-Python module. For example, the `src.polyfills.stdlib.pathlib` package contains the
+Python module. For example, the `polyfills.stdlib.pathlib` package contains the
 polyfills for the `pathlib` module.
 """
 import sys
