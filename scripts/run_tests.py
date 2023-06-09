@@ -2,6 +2,7 @@ import getopt
 import os
 import re
 import sys
+import traceback
 
 import unittest
 
@@ -163,8 +164,8 @@ if __name__ == "__main__":
             "hvq",
             ["help", "verbose", "quiet"],
         )
-    except getopt.GetoptError as err:
-        print(str(err))
+    except getopt.GetoptError:
+        traceback.print_exc()
         sys.exit(2)
 
     for opt, arg in opts:
