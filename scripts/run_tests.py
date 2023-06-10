@@ -68,7 +68,7 @@ def discover_tests(start_directory="src", package_path=None):
         list: A list of test files.
     """
     if package_path is None:
-        package_path = detect_package_folder("./src/polyfills/json")
+        package_path = detect_package_folder(start_directory)
         print("[AUTO] Project folder is '%s'" % package_path)
 
 
