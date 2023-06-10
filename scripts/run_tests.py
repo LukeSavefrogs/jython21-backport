@@ -1,3 +1,50 @@
+"""
+--------------------------------------------------------------------------------------------------------------
+python -m unittest -h       
+usage: python.exe -m unittest [-h] [-v] [-q] [--locals] [-f] [-c] [-b] [-k TESTNAMEPATTERNS] [tests ...]
+
+positional arguments:
+  tests                a list of any number of test modules, classes and test methods.
+
+optional arguments:
+  -h, --help           show this help message and exit
+  -v, --verbose        Verbose output
+  -q, --quiet          Quiet output
+  --locals             Show local variables in tracebacks
+  -f, --failfast       Stop on first fail or error
+  -c, --catch          Catch Ctrl-C and display results so far
+  -b, --buffer         Buffer stdout and stderr during tests
+  -k TESTNAMEPATTERNS  Only run tests which match the given substring
+
+Examples:
+  python.exe -m unittest test_module               - run tests from test_module
+  python.exe -m unittest module.TestClass          - run tests from module.TestClass
+  python.exe -m unittest module.Class.test_method  - run specified test method
+  python.exe -m unittest path/to/test_file.py      - run tests from test_file.py
+
+usage: python.exe -m unittest discover [-h] [-v] [-q] [--locals] [-f] [-c] [-b] [-k TESTNAMEPATTERNS] [-s START]        
+                                       [-p PATTERN] [-t TOP]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -v, --verbose         Verbose output
+  -q, --quiet           Quiet output
+  --locals              Show local variables in tracebacks
+  -f, --failfast        Stop on first fail or error
+  -c, --catch           Catch Ctrl-C and display results so far
+  -b, --buffer          Buffer stdout and stderr during tests
+  -k TESTNAMEPATTERNS   Only run tests which match the given substring
+  -s START, --start-directory START
+                        Directory to start discovery ('.' default)
+  -p PATTERN, --pattern PATTERN
+                        Pattern to match tests ('test*.py' default)
+  -t TOP, --top-level-directory TOP
+                        Top level directory of project (defaults to start directory)
+
+For test discovery all test modules must be importable from the top level directory of the project.
+--------------------------------------------------------------------------------------------------------------
+"""
+
 import getopt
 import os
 import re
@@ -7,20 +54,38 @@ import traceback
 import unittest
 
 
-def discover_tests(package="src"):
-    """Find all files containing at least one Test Case class.
+def discover_tests(start_directory="src", package_path=None):
+    """ Find all files containing at least one Test Case class.
 
     This function is a recursive version of the original discover_tests function.
     It is more flexible and allows for more complex package structures.
 
     Args:
-        package (str): The package name where to search for test files.
+        start_directory (str): The directory where to search the test files.
+        package_path (str): The full path to the package (will be used to format the package name).
 
     Returns:
         list: A list of test files.
     """
+    if package_path is None:
+        package_path = detect_package_folder("./src/polyfills/json")
+        print("[AUTO] Project folder is '%s'" % package_path)
+
 
     def walk_folder(root, package_directory=None):
+        # type: (str, str) -> list[str]
+        """ Traverses a directory and returns a list of all files containing at least one Test Case class.
+
+        Args:
+            root (str): Start directory.
+            package_directory (str, optional): First package directory found. Defaults to None.
+
+        Raises:
+            Exception: _description_
+
+        Returns:
+            list[str]: A list of test files.
+        """
         test_files = []
 
         # ----> Directory
@@ -28,10 +93,10 @@ def discover_tests(package="src"):
             if os.path.basename(root) == "__pycache__":
                 return []
 
-            if not "__init__.py" in os.listdir(root):
+            if os.listdir(root) == []:
                 return []
 
-            elif package_directory is None:
+            if package_directory is None and "__init__.py" in os.listdir(root):
                 print("Detected package: %s" % root)
                 package_directory = root
 
@@ -81,7 +146,7 @@ def discover_tests(package="src"):
 
         return test_files
 
-    return walk_folder(package)
+    return walk_folder(start_directory, package_path)
 
 
 def detect_package_folder(current_directory=os.getcwd()):
@@ -135,17 +200,14 @@ def detect_package_folder(current_directory=os.getcwd()):
         return current_directory
 
 
-def discovery(verbosity=1):
-    package_path = detect_package_folder("./src/polyfills")
-    print("Project folder is '%s'" % package_path)
-
-    test_files = discover_tests("./src/polyfills")
+def discovery(verbosity=1, start_directory="./src/"):
+    test_files = discover_tests(start_directory)
 
     print("Found %d test files:" % len(test_files))
     print("\n".join(["- " + file for file in test_files]) + "\n")
 
     # Add the package path to the PYTHONPATH so that tests can import the package
-    sys.path.append(os.path.dirname(package_path))
+    sys.path.append(os.path.dirname(detect_package_folder(start_directory)))
 
     # Run the tests
     suite = unittest.TestLoader().loadTestsFromNames(test_files)
@@ -157,12 +219,13 @@ def discovery(verbosity=1):
 # Command line interface
 if __name__ == "__main__":
     tests_verbosity = 1
+    tests_start_directory = "./src/"
 
     try:
         opts, args = getopt.getopt(
             sys.argv[1:],
-            "hvq",
-            ["help", "verbose", "quiet"],
+            "hvqs:",
+            ["help", "verbose", "quiet", "start-directory="],
         )
     except getopt.GetoptError:
         traceback.print_exc()
@@ -179,4 +242,7 @@ if __name__ == "__main__":
         elif opt in ("-q", "--quiet"):
             tests_verbosity = 0
 
-    sys.exit(not discovery(verbosity=tests_verbosity))
+        elif opt in ("-s", "--start-directory"):
+            tests_start_directory = arg
+
+    sys.exit(not discovery(verbosity=tests_verbosity, start_directory=tests_start_directory))
