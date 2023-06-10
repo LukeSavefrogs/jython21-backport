@@ -52,9 +52,10 @@ import sys
 import traceback
 
 import unittest
+import fnmatch
 
-
-def discover_tests(start_directory="src", package_path=None):
+def discover_tests(start_directory="src", file_pattern="test*.py", package_path=None):
+    # type: (str, str, str|None) -> list[str]
     """ Find all files containing at least one Test Case class.
 
     This function is a recursive version of the original discover_tests function.
@@ -72,8 +73,9 @@ def discover_tests(start_directory="src", package_path=None):
         print("[AUTO] Project folder is '%s'" % package_path)
 
 
-    def walk_folder(root, package_directory=None):
-        # type: (str, str) -> list[str]
+
+    def walk_folder(root, file_pattern, package_directory=None):
+        # type: (str, str, str|None) -> list[str]
         """ Traverses a directory and returns a list of all files containing at least one Test Case class.
 
         Args:
@@ -102,12 +104,12 @@ def discover_tests(start_directory="src", package_path=None):
 
             for entry in os.listdir(root):
                 test_files.extend(
-                    walk_folder(os.path.join(root, entry), package_directory)
+                    walk_folder(os.path.join(root, entry), file_pattern, package_directory)
                 )
 
         # ----> File
         elif os.path.isfile(root):
-            if not root.endswith(".py"):
+            if not re.match(fnmatch.translate(file_pattern), os.path.basename(root)):
                 return []
 
             # Check if file contains at least one Test Case class
@@ -146,7 +148,7 @@ def discover_tests(start_directory="src", package_path=None):
 
         return test_files
 
-    return walk_folder(start_directory, package_path)
+    return walk_folder(start_directory, file_pattern.strip(), package_path)
 
 
 def detect_package_folder(current_directory=os.getcwd()):
@@ -200,8 +202,8 @@ def detect_package_folder(current_directory=os.getcwd()):
         return current_directory
 
 
-def discovery(verbosity=1, start_directory="./src/"):
-    test_files = discover_tests(start_directory)
+def discovery(verbosity=1, start_directory="./src/", file_pattern="test*.py"):
+    test_files = discover_tests(start_directory, file_pattern=file_pattern)
 
     print("Found %d test files:" % len(test_files))
     print("\n".join(["- " + file for file in test_files]) + "\n")
@@ -220,12 +222,13 @@ def discovery(verbosity=1, start_directory="./src/"):
 if __name__ == "__main__":
     tests_verbosity = 1
     tests_start_directory = "./src/"
+    tests_file_pattern = "test*.py"
 
     try:
         opts, args = getopt.getopt(
             sys.argv[1:],
-            "hvqs:",
-            ["help", "verbose", "quiet", "start-directory="],
+            "hvqs:p:",
+            ["help", "verbose", "quiet", "start-directory=", "pattern="],
         )
     except getopt.GetoptError:
         traceback.print_exc()
@@ -244,5 +247,14 @@ if __name__ == "__main__":
 
         elif opt in ("-s", "--start-directory"):
             tests_start_directory = arg
+        
+        elif opt in ("-p", "--pattern"):
+            tests_file_pattern = arg
 
-    sys.exit(not discovery(verbosity=tests_verbosity, start_directory=tests_start_directory))
+    sys.exit(
+        not discovery(
+            verbosity=tests_verbosity,
+            start_directory=tests_start_directory,
+            file_pattern=tests_file_pattern,
+        )
+    )
