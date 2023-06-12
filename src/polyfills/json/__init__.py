@@ -1,5 +1,7 @@
 """ Basic implementation of a JSON parser written in pure Python for very old Python versions (2.2 and lower). """
-import re
+import re as _re
+
+__all__ = ["dumps", "dump", "loads", "load"]
 
 def dumps(
         obj,
@@ -423,8 +425,8 @@ def loads(
     # ---> Decode JSON value
     else:
         # https://stackoverflow.com/a/66379646/8965861
-        REGEX_FLOAT   = re.compile(r"(?i)^\s*[+-]?(?:inf(inity)?|nan|(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?)\s*$")
-        REGEX_INTEGER = re.compile(r"^([+-]?[1-9]\d*|0)$")
+        REGEX_FLOAT   = _re.compile(r"(?i)^\s*[+-]?(?:inf(inity)?|nan|(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?)\s*$")
+        REGEX_INTEGER = _re.compile(r"^([+-]?[1-9]\d*|0)$")
 
         # ---> String
         #
