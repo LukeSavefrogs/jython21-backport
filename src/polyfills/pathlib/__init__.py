@@ -76,20 +76,20 @@ class Path(Base):
         exec("import os as _os")
         if _os.name == 'nt':
             self._flavour = _WindowsFlavour()
-            self._path = _os.path.join(*args).replace("/", "\\")
+            self._path = _os.path.join(*args).replace("/", self._flavour.sep)
         else:
             self._flavour = _PosixFlavour()
             self._path = _os.path.join(*args)
         
-        if self._path.replace("\\", "/").startswith("./"):
+        if self.as_posix().startswith("./"):
             self._path = self._path[2:]
 
         # Remove the final path if it references the current folder
-        if self._path.replace("\\", "/").endswith("/."):
+        if self.as_posix().endswith("/."):
             self._path = self._path[:-2]
 
         # Remove excess trailing slashes, except when the path is the root
-        while self._path.replace("\\", "/").endswith("/") and self._path.replace("\\", "/") not in ["/", "//"]:
+        while self.as_posix().endswith("/") and self.as_posix() not in ["/", "//"]:
             self._path = self._path[:-1]
 
         
