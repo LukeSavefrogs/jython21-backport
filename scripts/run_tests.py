@@ -242,7 +242,7 @@ if __name__ == "__main__":
 
     for opt, arg in opts:
         if opt in ("-h", "--help"):
-            print("Usage: run_tests.py [-h] [-v] [-q]")
+            print("Usage: run_tests.py [-h] [-v] [-q] [-s START] [-p PATTERN]")
             sys.exit()
 
         elif opt in ("-v", "--verbose"):
