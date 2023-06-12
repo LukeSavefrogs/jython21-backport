@@ -86,10 +86,11 @@ def discover_tests(start_directory="src", file_pattern="test*.py", package_path=
 
         Args:
             root (str): Start directory.
+            file_pattern (str): File pattern (already converted to regex) to match.
             package_directory (str, optional): First package directory found. Defaults to None.
 
         Raises:
-            Exception: _description_
+            Exception: When the entity being analyzed is neither a file nor a directory.
 
         Returns:
             list[str]: A list of test files.
@@ -115,7 +116,7 @@ def discover_tests(start_directory="src", file_pattern="test*.py", package_path=
 
         # ----> File
         elif os.path.isfile(root):
-            if not re.match(fnmatch.translate(file_pattern), os.path.basename(root)):
+            if not re.match(file_pattern, os.path.basename(root)):
                 return []
 
             # Check if file contains at least one Test Case class
@@ -154,7 +155,7 @@ def discover_tests(start_directory="src", file_pattern="test*.py", package_path=
 
         return test_files
 
-    return walk_folder(start_directory, file_pattern.strip(), package_path)
+    return walk_folder(start_directory, fnmatch.translate(file_pattern.strip()), package_path)
 
 
 def detect_package_folder(current_directory=os.getcwd()):
