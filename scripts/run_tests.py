@@ -1,4 +1,10 @@
 """
+Drop-in replacement for the original unittest `discover` feature (which 
+is not present in older Python/Jython versions).
+
+Jython's `unittest` also has only `--help`, `--verbose` and `--quiet` CLI options.
+This script provides support for the missing ones.
+
 --------------------------------------------------------------------------------------------------------------
 python -m unittest -h       
 usage: python.exe -m unittest [-h] [-v] [-q] [--locals] [-f] [-c] [-b] [-k TESTNAMEPATTERNS] [tests ...]
