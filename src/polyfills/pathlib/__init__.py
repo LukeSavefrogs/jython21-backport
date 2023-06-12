@@ -180,7 +180,7 @@ class Path(Base):
         Returns:
             str: The string representation of the path with forward slashes (`/`).
         """
-        return str(self).replace(self._flavour.sep, '/')
+        return str(self).replace("\\", "/")
 
     def absolute(self):
         """Return an absolute version of this path.  This function works
