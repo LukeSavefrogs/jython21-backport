@@ -1,6 +1,18 @@
 """ Basic implementation of a JSON parser written in pure Python for very old Python versions (2.2 and lower). """
 import re as _re
 
+IS_BOOLEAN_DEFINED = str(1==1) == 'True'
+IS_POLYFILL_AVAILABLE = 0 == 1
+
+if not IS_BOOLEAN_DEFINED:
+    # Try to import the boolean polyfill
+    try:
+        import polyfills.stdlib.future_types.bool as _bool
+        exec("True = _bool.bool(1); False = _bool.bool(0)")
+        IS_POLYFILL_AVAILABLE = 1 == 1
+    except ImportError:
+        pass
+
 __all__ = ["dumps", "dump", "loads", "load"]
 
 def dumps(
@@ -19,8 +31,7 @@ def dumps(
     Returns:
         json (str): A string representation of a valid JSON object.
     """
-    are_boolean_defined = str(1==1) == 'True'
-    if not are_boolean_defined and (truthy_value is None and falsy_value is None):
+    if not IS_BOOLEAN_DEFINED and not IS_POLYFILL_AVAILABLE and (truthy_value is None and falsy_value is None):
         raise Exception(
             "No boolean values (True/False) detected and the 'truthy_value' and 'falsy_value' options are not set." +
             " If you're using this module on Python < 2.3 set them accordingly."
@@ -144,8 +155,7 @@ def loads(
     """
     json_str = json_str.strip()
 
-    are_boolean_defined = str(1==1) == 'True'
-    if not are_boolean_defined and (truthy_value is None and falsy_value is None):
+    if not IS_BOOLEAN_DEFINED and not IS_POLYFILL_AVAILABLE and (truthy_value is None and falsy_value is None):
         print(
             "Warning: No boolean values (True/False) detected and the 'truthy_value' and 'falsy_value' options are not set." +
             " If you're using this module on Python < 2.3 set them accordingly."
@@ -454,12 +464,16 @@ def loads(
         elif json_str == "true":
             if truthy_value is not None:
                 return truthy_value
+            elif IS_POLYFILL_AVAILABLE:
+                return _bool.bool(1)
             else:
                 return __true__
             
         elif json_str == "false":
             if falsy_value is not None:
                 return falsy_value
+            elif IS_POLYFILL_AVAILABLE:
+                return _bool.bool(0)
             else:
                 return __false__
         

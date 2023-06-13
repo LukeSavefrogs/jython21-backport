@@ -2,6 +2,19 @@ import unittest
 
 import polyfills.json as json
 
+IS_BOOLEAN_DEFINED = str(1==1) == 'True'
+IS_POLYFILL_AVAILABLE = 0 == 1
+
+if not IS_BOOLEAN_DEFINED:
+    # Try to import the boolean polyfill
+    try:
+        import polyfills.stdlib.future_types.bool as _bool
+        exec("True = bool(1); False = bool(0)")
+        IS_POLYFILL_AVAILABLE = 1 == 1
+    except ImportError:
+        pass
+
+
 class BaseTestCase(unittest.TestCase):
     def test_string(self):
         self.assertEqual(
@@ -37,11 +50,11 @@ class BaseTestCase(unittest.TestCase):
     def test_bool(self):
         self.assertEqual(
 			json.loads('true'),
-        	1 == 1
+        	True
 		)
         self.assertEqual(
 			json.loads('false'),
-        	1 == 0
+        	False
 		)
 
     def test_custom_bool(self):
