@@ -55,5 +55,12 @@ jobs:
           jython-version: "${{ matrix.jython_version }}"
 
       - name: Run Jython
+        if: ${{ ! startsWith(matrix.os, 'windows-') }}
         run: |
-          jython ./scripts/run_tests.py --verbose --pattern "*.py"
+          jython ./scripts/run_tests.py --verbose --pattern "*.py" --start-directory "./src/polyfills/"
+      
+      - name: Run Jython (Windows)
+        if: ${{ startsWith(matrix.os, 'windows-') }}
+        shell: cmd
+        run: |
+          jython ./scripts/run_tests.py --verbose --pattern "*.py" --start-directory "./src/polyfills/"
