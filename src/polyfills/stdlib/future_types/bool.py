@@ -7,6 +7,10 @@ This module exports three objects:
     - `True` is the boolean value `True`.
     - `False` is the boolean value `False`.
 
+Usage:
+    ```
+    from polyfills.stdlib.future_types.bool import True, False
+    ```
 
 ### `bool` class
 
