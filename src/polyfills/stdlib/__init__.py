@@ -1,1 +1,1 @@
-""" Polyfill for some of the features natively available in newer Python versions. """
+""" Polyfill for some of the features natively available in the standard library of newer Python versions. """

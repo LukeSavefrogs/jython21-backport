@@ -1,4 +1,6 @@
-""" Patch for boolean values in Python <2.3.
+""" A "quick-and-dirty" patch for boolean values in Python <2.3.
+
+For more complex use cases, consider using the `bool` type from the `polyfills.stdlib.future_types`.
 
 Usage:
 
