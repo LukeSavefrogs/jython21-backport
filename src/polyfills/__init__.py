@@ -4,8 +4,8 @@ The polyfills are organized in subpackages, each one containing the polyfills fo
 Python module. For example, the `polyfills.stdlib.pathlib` package contains the
 polyfills for the `pathlib` module.
 """
-import sys
-import os
+import sys as _sys
+import os as _os
 
 
 def is_jython():
@@ -27,10 +27,10 @@ def is_jython():
     runtime = str(java.lang.System.getProperty("java.runtime.name"))
 
     # Method 3: Check if the platform is "java{JDK_version}" (ex. "java1.8.0_351")
-    platform = str(sys.platform).lower()
+    platform = str(_sys.platform).lower()
 
     # Method 4: Check if the os name is set to "java"
-    operative_system = os.name.lower()
+    operative_system = _os.name.lower()
 
     return (
         runtime == "Java(TM) SE Runtime Environment"
