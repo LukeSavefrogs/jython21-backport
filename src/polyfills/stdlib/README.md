@@ -6,4 +6,8 @@ Backporting of some of the features natively available in newer Python versions:
 - [**`sorted()`**](sorted.py) function
 - [**`NotImplementedError`**](exceptions.py) exception (`Python 2.2`)
 
-> See [**here**](boolean.py) for a quick one-time workaround for `True` and `False`
+> For a quick one-time workaround for `True` and `False`:
+>
+> ```python
+> exec("try: (True, False)\nexcept NameError: exec('True = 1==1; False = 1==0')")
+> ```
