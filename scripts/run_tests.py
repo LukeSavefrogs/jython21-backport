@@ -80,8 +80,8 @@ def discover_tests(start_directory="src", file_pattern="test*.py", package_path=
 
 
 
-    def walk_folder(root, file_pattern, package_directory=None):
-        # type: (str, str, str|None) -> list[str]
+    def walk_folder(root, file_pattern, package_directory=None, top_directory=None):
+        # type: (str, str, str|None, str|None) -> list[str]
         """ Traverses a directory and returns a list of all files containing at least one Test Case class.
 
         Args:
@@ -111,7 +111,7 @@ def discover_tests(start_directory="src", file_pattern="test*.py", package_path=
 
             for entry in os.listdir(root):
                 test_files.extend(
-                    walk_folder(os.path.join(root, entry), file_pattern, package_directory)
+                    walk_folder(os.path.join(root, entry), file_pattern, package_directory, start_directory)
                 )
 
         # ----> File
@@ -142,12 +142,9 @@ def discover_tests(start_directory="src", file_pattern="test*.py", package_path=
             )
 
             if contains_test_case:
-                file_in_package = root[len(package_directory) + 1 :][:-3]
-                test_files.append(
-                    os.path.basename(package_directory)
-                    + "."
-                    + file_in_package.replace(os.sep, ".")
-                )
+                file_in_package = os.path.normpath(root)[len(os.path.normpath(package_directory)) + 1 :][:-3]
+                full_qualified_path = os.path.basename(package_directory) + "." + file_in_package.replace(os.sep, ".")
+                test_files.append(full_qualified_path)
 
         # ----> Unknown
         else:
@@ -181,7 +178,7 @@ def detect_package_folder(current_directory=os.getcwd()):
         current_directory = os.path.dirname(current_directory)
 
     if previous_directory is not None:
-        return previous_directory
+        return os.path.normpath(previous_directory)
 
     # Traverse downwards until we find the FIRST directory containing an __init__.py file
     while "__init__.py" not in os.listdir(current_directory):
@@ -206,7 +203,7 @@ def detect_package_folder(current_directory=os.getcwd()):
             current_directory = os.path.join(current_directory, directory)
             break
     else:
-        return current_directory
+        return os.path.normpath(current_directory)
 
 
 def discovery(verbosity=1, start_directory="./src/", file_pattern="test*.py"):
