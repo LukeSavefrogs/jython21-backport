@@ -33,7 +33,7 @@ Provides `loads`, `dumps` and their counterparts `load` and `dump`.
 ### Gotchas 👀
 
 - `Infinity` and `NaN` currently do not follow strictly the `json` module rules (still no `allow_nan` parameter).
-- If using this module on **Python 2.3 and lower** you MUST pass `truthy_value` and `falsy_value`;
+- If using this module on **Python 2.3 and lower** you _may need_ to pass `truthy_value` and `falsy_value`;
 
 ### Known bugs 🐛
 
