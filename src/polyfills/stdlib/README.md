@@ -2,7 +2,7 @@
 
 Backporting of some of the features natively available in newer Python versions:
 
-- [**`bool`**](types/bool.py) class (as well as `True` and `False`)
+- [**`bool`**](future_types/bool.py) class (as well as `True` and `False`)
 - [**`sorted()`**](sorted.py) function
 - [**`NotImplementedError`**](exceptions.py) exception (`Python 2.2`)
 
