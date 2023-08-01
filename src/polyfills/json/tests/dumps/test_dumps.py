@@ -9,6 +9,7 @@ if not IS_BOOLEAN_DEFINED:
     # Try to import the boolean polyfill
     try:
         import polyfills.stdlib.future_types.bool as _bool
+        exec("True = _bool.bool(1); False = _bool.bool(0)")
         IS_POLYFILL_AVAILABLE = 1 == 1
     except ImportError:
         pass
