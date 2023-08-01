@@ -50,6 +50,7 @@ optional arguments:
 For test discovery all test modules must be importable from the top level directory of the project.
 --------------------------------------------------------------------------------------------------------------
 """
+from __future__ import nested_scopes
 
 import getopt
 import os
