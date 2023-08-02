@@ -15,7 +15,9 @@ import time as _time
 import unittest as _unittest
 
 try:
+    # fmt: off
     from java.lang.management import ManagementFactory as _ManagementFactory # pyright: ignore[reportMissingImports]
+    # fmt: on
 except ImportError:
     pass
 
@@ -38,28 +40,29 @@ DEBUG = 10
 NOTSET = 0
 
 _levelToName = {
-    CRITICAL: 'CRITICAL',
-    ERROR: 'ERROR',
-    WARNING: 'WARNING',
-    INFO: 'INFO',
-    DEBUG: 'DEBUG',
-    NOTSET: 'NOTSET',
+    CRITICAL: "CRITICAL",
+    ERROR: "ERROR",
+    WARNING: "WARNING",
+    INFO: "INFO",
+    DEBUG: "DEBUG",
+    NOTSET: "NOTSET",
 }
 _nameToLevel = {
-    'CRITICAL': CRITICAL,
-    'FATAL': FATAL,
-    'ERROR': ERROR,
-    'WARN': WARNING,
-    'WARNING': WARNING,
-    'INFO': INFO,
-    'DEBUG': DEBUG,
-    'NOTSET': NOTSET,
+    "CRITICAL": CRITICAL,
+    "FATAL": FATAL,
+    "ERROR": ERROR,
+    "WARN": WARNING,
+    "WARNING": WARNING,
+    "INFO": INFO,
+    "DEBUG": DEBUG,
+    "NOTSET": NOTSET,
 }
+
 
 def _checkLevel(level):
     # type: (str|int) -> int
-    """ Given a level name or level number, return the level number. 
-    
+    """Given a level name or level number, return the level number.
+
     Args:
         level (str|int): The level name or number.
 
@@ -75,6 +78,7 @@ def _checkLevel(level):
     else:
         raise TypeError("Level not an integer or a valid string: %r" % level)
     return rv
+
 
 def getLevelName(level):
     """
@@ -98,21 +102,24 @@ def getLevelName(level):
     result = _levelToName.get(level)
     if result is not None:
         return result
-    
+
     result = _nameToLevel.get(level)
     if result is not None:
         return result
     return "Level %s" % level
+
+
 # ------------------------------------------------------------------------------------
 
 ROOT_LOGGER_NAME = "root"
 DEFAULT_LOGGING_FORMAT = "%(levelname)s:%(name)s:%(message)s"
 DEFAULT_LOGGING_DATE_FORMAT = "%Y-%m-%d %H:%M %Z"
 
+
 # Define a logger class useful for printing helpful messages
 class Logger:
     """Logger class for Python 2.x that mimics the `logging` module."""
-    
+
     def __init__(
         self,
         name,
@@ -129,7 +136,7 @@ class Logger:
         self.level = _checkLevel(level)
         self._format = DEFAULT_LOGGING_FORMAT
         self._time_format = DEFAULT_LOGGING_DATE_FORMAT
-        
+
         # From the `logging` module
         self._cache = {}
         self.parent = None
@@ -168,16 +175,14 @@ class Logger:
         try:
             return self._cache[level]
         except KeyError:
-            is_enabled = (
-                level >= self.getEffectiveLevel()
-            )
+            is_enabled = level >= self.getEffectiveLevel()
             self._cache[level] = is_enabled
             return is_enabled
 
     def log(self, _log_level, message):
         # type: (str, str|int) -> None
-        """ Base function used by the other logging methods to abstract the logic.
-        
+        """Base function used by the other logging methods to abstract the logic.
+
         Args:
             message (str): The message to log.
             _log_level (str|int): The level of the message.
@@ -190,8 +195,9 @@ class Logger:
         caller = _sys._getframe().f_back.f_back.f_code.co_name
         if caller == "?":
             caller = "__main__"
-        
+
         # See https://docs.python.org/3/library/logging.html#logrecord-attributes
+        # fmt: off
         print(
             self._format
             % {
@@ -216,6 +222,7 @@ class Logger:
                 "threadName": "__NOT_IMPLEMENTED__",       # TODO: LogRecord 'threadName' not implemented
             }
         )
+        # fmt: on
 
     def debug(self, message=""):
         self.log(DEBUG, message)
@@ -242,13 +249,16 @@ class RootLogger(Logger):
     it must have a logging level and there is only one instance of it in
     the hierarchy.
     """
+
     def __init__(self, level):
         """
         Initialize the logger with the name "root".
         """
         Logger.__init__(self, ROOT_LOGGER_NAME, level)
 
+
 root = RootLogger(WARNING)
+
 
 def getLogger(name=None):
     # type: (str) -> Logger
@@ -259,12 +269,9 @@ def getLogger(name=None):
     return Logger(name)
 
 
-
-def basicConfig(
-    **kwargs
-):
+def basicConfig(**kwargs):
     """Basic configuration for the logging system.
-    
+
     Args:
         level (str, optional): The minimum logging level. Defaults to "info".
         format (str, optional): The logging format as specified in the docs (https://docs.python.org/3/library/logging.html#logrecord-attributes). Defaults to `%(levelname)s:%(name)s:%(message)s`.
@@ -284,9 +291,13 @@ def basicConfig(
         [2021-03-21 16:20] INFO - root - Hello World!
         ```
     """
-    unrecognised_keys = [ key for key in kwargs.keys() if key not in ["level", "format", "datefmt"] ]
+    unrecognised_keys = [
+        key for key in kwargs.keys() if key not in ["level", "format", "datefmt"]
+    ]
     if unrecognised_keys:
-        raise ValueError('Unrecognised argument(s): %s' % (', '.join(unrecognised_keys)))
+        raise ValueError(
+            "Unrecognised argument(s): %s" % (", ".join(unrecognised_keys))
+        )
 
     logger_level = kwargs.get("level", None)
     logger_format = kwargs.get("format", None)
@@ -294,7 +305,7 @@ def basicConfig(
 
     if logger_level is not None:
         root.setLevel(logger_level)
-    
+
     if logger_format is not None:
         root._format = logger_format
 
@@ -302,10 +313,11 @@ def basicConfig(
         root._time_format = logger_datefmt
 
 
-#---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 # Utility functions at module level.
 # Basically delegate everything to the root logger.
-#---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+
 
 def critical(msg, *args, **kwargs):
     """
@@ -317,7 +329,9 @@ def critical(msg, *args, **kwargs):
     #     basicConfig()
     root.critical(msg, *args, **kwargs)
 
+
 fatal = critical
+
 
 def error(msg, *args, **kwargs):
     """
@@ -329,6 +343,7 @@ def error(msg, *args, **kwargs):
     #     basicConfig()
     root.error(msg, *args, **kwargs)
 
+
 def exception(msg, *args, exc_info=True, **kwargs):
     """
     Log a message with severity 'ERROR' on the root logger, with exception
@@ -336,6 +351,7 @@ def exception(msg, *args, exc_info=True, **kwargs):
     a console handler with a pre-defined format.
     """
     error(msg, *args, exc_info=exc_info, **kwargs)
+
 
 def warning(msg, *args, **kwargs):
     """
@@ -347,13 +363,18 @@ def warning(msg, *args, **kwargs):
     #     basicConfig()
     root.warning(msg, *args, **kwargs)
 
+
 def warn(msg, *args, **kwargs):
     try:
-        warnings.warn("The 'warn' function is deprecated, "
-            "use 'warning' instead", DeprecationWarning, 2)
+        warnings.warn(
+            "The 'warn' function is deprecated, " "use 'warning' instead",
+            DeprecationWarning,
+            2,
+        )
     except NameError:
         pass
     warning(msg, *args, **kwargs)
+
 
 def info(msg, *args, **kwargs):
     """
@@ -365,6 +386,7 @@ def info(msg, *args, **kwargs):
     #     basicConfig()
     root.info(msg, *args, **kwargs)
 
+
 def debug(msg, *args, **kwargs):
     """
     Log a message with severity 'DEBUG' on the root logger. If the logger has
@@ -374,6 +396,7 @@ def debug(msg, *args, **kwargs):
     # if len(root.handlers) == 0:
     #     basicConfig()
     root.debug(msg, *args, **kwargs)
+
 
 def log(level, msg, *args, **kwargs):
     """
@@ -393,7 +416,7 @@ class LoggingTestCase(_unittest.TestCase):
 
         logger = getLogger("test_logger")
         self.assertEqual(logger.name, "test_logger")
-    
+
     def test_setlevel(self):
         _true = 1 == 1
         _false = 1 == 0
@@ -440,7 +463,7 @@ class LoggingTestCase(_unittest.TestCase):
         self.assertEqual(logger.isEnabledFor(FATAL), _true)
         self.assertEqual(logger.isEnabledFor(WARNING), _false)
         self.assertEqual(logger.isEnabledFor(DEBUG), _false)
-    
+
     def test_logger_singleton(self):
         logger = getLogger()
         self.assertEqual(logger, root)
@@ -463,13 +486,15 @@ if __name__ == "__main__":
     fatal("This is a message with severity 'FATAL'")
     log(CRITICAL, "This is a custom log with severity 'CRITICAL'")
 
-
     assert getLogger() == getLogger(name=None)
 
     print("\n\n")
     print("--------------- Testing custom logger ---------------")
     logger = getLogger("test_logger")
-    print("Effective level for logger '%s': %d\n" % (logger.name, logger.getEffectiveLevel()))
+    print(
+        "Effective level for logger '%s': %d\n"
+        % (logger.name, logger.getEffectiveLevel())
+    )
 
     for method in ["debug", "info", "warning", "error", "critical", "fatal"]:
         getattr(logger, method)("This is a message with level '%s'" % method.upper())
@@ -478,6 +503,9 @@ if __name__ == "__main__":
     print("--------------- Setting level to 'WARNING' ---------------")
 
     logger.setLevel("WARNING")
-    print("Effective level for logger '%s': %d\n" % (logger.name, logger.getEffectiveLevel()))
+    print(
+        "Effective level for logger '%s': %d\n"
+        % (logger.name, logger.getEffectiveLevel())
+    )
     for method in ["debug", "info", "warning", "error", "critical", "fatal"]:
         getattr(logger, method)("This is a message with level '%s'" % method.upper())
