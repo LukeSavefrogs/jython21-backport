@@ -29,7 +29,7 @@ try:
 except ImportError:
     pass
 
-__all__ = ["getLogger"]
+__all__ = ["getLogger", "basicConfig"]
 
 # --------------------- Transform levels to values and viceversa ---------------------
 #                  (completely stripped from the `logging` module :D)
