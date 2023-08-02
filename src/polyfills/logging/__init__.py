@@ -69,7 +69,7 @@ def _checkLevel(level):
     Returns:
         int: The level number.
     """
-    if isinstance(level, int):
+    if type(level).__name__ in ["int", "org.python.core.PyInteger"]:
         rv = level
     elif str(level) == level:
         if level not in _nameToLevel:
@@ -263,7 +263,7 @@ root = RootLogger(WARNING)
 def getLogger(name=None):
     # type: (str) -> Logger
     """Returns a logger object with the specified name."""
-    if name is None or (isinstance(name, str) and name == ROOT_LOGGER_NAME):
+    if name is None or (type(name).__class__ in ["str", "org.python.core.PyString"] and name == ROOT_LOGGER_NAME):
         return root
 
     return Logger(name)
@@ -344,13 +344,13 @@ def error(msg, *args, **kwargs):
     root.error(msg, *args, **kwargs)
 
 
-def exception(msg, *args, exc_info=True, **kwargs):
+def exception(msg, *args, **kwargs):
     """
     Log a message with severity 'ERROR' on the root logger, with exception
     information. If the logger has no handlers, basicConfig() is called to add
     a console handler with a pre-defined format.
     """
-    error(msg, *args, exc_info=exc_info, **kwargs)
+    error(msg, *args, **kwargs)
 
 
 def warning(msg, *args, **kwargs):
