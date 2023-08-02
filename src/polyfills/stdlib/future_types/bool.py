@@ -200,12 +200,13 @@ class bool:
 
 # Locally, `True` and `False` are never redefined, since they are keywords.
 try:
-    (True, False)
+    (True, False) # pyright: ignore[reportUnusedExpression]
 except NameError:
+    # Run inside `exec` to bypass the `SyntaxError` that would be shown by modern IDEs.
     exec("True = bool(1); False = bool(0)")
 
     # Add `True` and `False` to the list of exported names.
-    __all__ = ["bool", "True", "False"]
+    __all__ = ["bool", "True", "False"] # pyright: ignore[reportUnsupportedDunderAll]
 
 
 class _BooleanTestCase(_unittest.TestCase):
