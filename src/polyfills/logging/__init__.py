@@ -15,9 +15,7 @@ import time as _time
 import unittest as _unittest
 
 try:
-    from java.lang.management import (  # pyright: ignore[reportMissingImports]
-        ManagementFactory as _ManagementFactory,
-    )
+    from java.lang.management import ManagementFactory as _ManagementFactory # pyright: ignore[reportMissingImports]
 except ImportError:
     pass
 
