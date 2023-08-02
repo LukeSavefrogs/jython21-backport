@@ -4,9 +4,6 @@ WARNING:
     This module is not complete by any means, nor it follows strictly the `logging` module API.
 
     For example, here are some differences:
-    - There is not `basicConfig` function
-    - The `Logger` class here accepts `fmt` and `datefmt` in the constructor, where originally
-        are supposed to be set via `Formatter`
     - The `Logger` class does not currently support parents
     - The `Logger` class does not currently support filters
     - The `Logger` class does not currently support handlers
