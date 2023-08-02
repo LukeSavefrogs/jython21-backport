@@ -69,4 +69,3 @@ logger.info("This will be printed")
   - `force`: Currently every call to the `basicConfig` function **overwrites the previous configuration** (same as `force=True`)
 - The **`Logger`** object...
   - **cannot have custom `filters` or `handlers`** (no `addFilter` or `addHandler` methods)
-  - has a **slightly different signature**, with `fmt` and `datefmt` being set via constructor instead of a `Formatter` class
