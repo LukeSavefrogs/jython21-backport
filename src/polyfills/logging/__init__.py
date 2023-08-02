@@ -72,7 +72,7 @@ def _checkLevel(level):
     if type(level).__name__ in ["int", "org.python.core.PyInteger"]:
         rv = level
     elif str(level) == level:
-        if level not in _nameToLevel:
+        if level not in _nameToLevel.keys():
             raise ValueError("Unknown level: %r" % level)
         rv = _nameToLevel[level]
     else:
