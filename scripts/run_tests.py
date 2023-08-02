@@ -1,9 +1,10 @@
 """
-Drop-in replacement for the original unittest `discover` feature (which 
-is not present in older Python/Jython versions).
+Drop-in replacement for the original unittest `discover` feature (introduced in Python 2.7).
 
 Jython's `unittest` also has only `--help`, `--verbose` and `--quiet` CLI options.
 This script provides support for the missing ones.
+
+NOTE: The `unittest` module was introduced in Python 2.1. This script WILL NOT work with older versions (<2.1).
 
 --------------------------------------------------------------------------------------------------------------
 python -m unittest -h       
@@ -32,17 +33,17 @@ usage: python.exe -m unittest discover [-h] [-v] [-q] [--locals] [-f] [-c] [-b] 
                                        [-p PATTERN] [-t TOP]
 
 optional arguments:
-  -h, --help            show this help message and exit
-  -v, --verbose         Verbose output
-  -q, --quiet           Quiet output
+  -h, --help            show this help message and exit                             [ADDED]  (can be improved)
+  -v, --verbose         Verbose output                                              [ADDED]
+  -q, --quiet           Quiet output                                                [ADDED]
   --locals              Show local variables in tracebacks
   -f, --failfast        Stop on first fail or error
   -c, --catch           Catch Ctrl-C and display results so far
   -b, --buffer          Buffer stdout and stderr during tests
   -k TESTNAMEPATTERNS   Only run tests which match the given substring
-  -s START, --start-directory START
+  -s START, --start-directory START                                                 [ADDED]
                         Directory to start discovery ('.' default)
-  -p PATTERN, --pattern PATTERN
+  -p PATTERN, --pattern PATTERN                                                     [ADDED]
                         Pattern to match tests ('test*.py' default)
   -t TOP, --top-level-directory TOP
                         Top level directory of project (defaults to start directory)
