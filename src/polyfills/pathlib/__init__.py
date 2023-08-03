@@ -14,73 +14,79 @@ try:
     from pathlib import Path as _Path
 except ImportError:
     pathlib_available = 0
-else: 
+else:
     pathlib_available = 1
 
 
 __all__ = ["Path"]
 
+
 class _Flavour:
     """A flavour implements a particular (platform-specific) set of path
-    semantics."""  
+    semantics."""
+
 
 class _WindowsFlavour(_Flavour):
-    """ Implements Windows path semantics. """
+    """Implements Windows path semantics."""
 
     # Reference for Windows paths can be found at
     # http://msdn.microsoft.com/en-us/library/aa365247%28v=vs.85%29.aspx
     name = "Windows"
     """ Name of the flavour. """
 
-    sep = '\\'
+    sep = "\\"
     """ Path separator. """
 
-    altsep = '/'
+    altsep = "/"
     """ Alternate pathname separator. """
 
     has_drv = 1 == 1
 
-    is_supported = (_os.name == 'nt')
+    is_supported = _os.name == "nt"
     """ Wether the flavour is supported on the current platform. """
 
+
 class _PosixFlavour(_Flavour):
-    """ Implements Posix path semantics. """
-    
+    """Implements Posix path semantics."""
+
     name = "Posix"
     """ Name of the flavour. """
 
-    sep = '/'
+    sep = "/"
     """ Path separator. """
 
-    altsep = ''
+    altsep = ""
     """ Alternate pathname separator. """
 
     has_drv = 1 == 0
 
-    is_supported = (_os.name != 'nt')
-    """ Wether the flavour is supported on the current platform. """ 
+    is_supported = _os.name != "nt"
+    """ Wether the flavour is supported on the current platform. """
+
 
 class Base:
     pass
 
+
 class Path(Base):
-    """ Represents a path to a file or directory. 
-    
+    """Represents a path to a file or directory.
+
     Polyfill for `pathlib.Path` for Jython.
     """
+
     _path = ""
     _flavour = None
 
     def __init__(self, *args, **kwargs):
         # Ensure the os module is always loaded, even if the class is copied
         exec("import os as _os")
-        if _os.name == 'nt':
+        if _os.name == "nt":
             self._flavour = _WindowsFlavour()
             self._path = _os.path.join(*args).replace("/", self._flavour.sep)
         else:
             self._flavour = _PosixFlavour()
             self._path = _os.path.join(*args)
-        
+
         if self.as_posix().startswith("./"):
             self._path = self._path[2:]
 
@@ -92,41 +98,43 @@ class Path(Base):
         while self.as_posix().endswith("/") and self.as_posix() not in ["/", "//"]:
             self._path = self._path[:-1]
 
-        
     def __str__(self):
         return str(self._path)
-    
+
     def __repr__(self):
-        return "%s('%s')" % (self._flavour.name + "Path", str(self._path).replace("\\", "/"))
-    
+        return "%s('%s')" % (
+            self._flavour.name + "Path",
+            str(self._path).replace("\\", "/"),
+        )
+
     def __div__(self, other):
         if str(self) == ".":
             return Path(str(other))
-        
+
         return Path(str(self), str(other))
-    
+
     def __truediv__(self, other):
         if str(self) == ".":
             return Path(str(other))
-        
+
         return Path(str(self), str(other))
-    
+
     def __rdiv__(self, other):
         if str(other) == ".":
             return Path(str(self))
-        
+
         return Path(str(other), str(self))
-    
+
     def __rtruediv__(self, other):
         if str(other) == ".":
             return Path(str(self))
-        
+
         return Path(str(other), str(self))
-    
+
     # The `__getattribute__` magic method is not present in Python 2.1
     def __getattr__(self, name):
-        """ `__getattr__` gets called every time an undefined attribute is accessed. 
-        
+        """`__getattr__` gets called every time an undefined attribute is accessed.
+
         We use this to implement the `parent`, `name`, `stem` and `suffix` properties.
 
         Args:
@@ -136,15 +144,15 @@ class Path(Base):
             # `.` and `..` are actually children of the current folder (`.`)
             if self.as_posix() in [".", ".."]:
                 return Path(".")
-            
+
             parent_folder = _os.path.dirname(str(self))
             return Path(parent_folder)
-        
+
         elif name == "name":
             return _os.path.basename(str(self))
-        
-        elif name == "stem":     # Return the name of the file
-            """ Return the final path component, without its suffix, if any.
+
+        elif name == "stem":  # Return the name of the file
+            """Return the final path component, without its suffix, if any.
             CPython 3.9.6:
             >>> os.path.splitext("..")
             ('..', '')
@@ -154,29 +162,29 @@ class Path(Base):
             ('.', '.')
             """
             basename = _os.path.basename(str(self))
-            
+
             if basename == ".":
                 return ""
             elif basename == "..":
                 return ".."
-            
+
             return _os.path.splitext(basename)[0]
-        
-        elif name == "suffix":   # Return the extension of the file
+
+        elif name == "suffix":  # Return the extension of the file
             basename = _os.path.basename(str(self))
             suffix = Path(basename).as_posix().split("/")[-1]
-            
+
             if suffix in [".", ".."]:
                 return ""
-            
+
             return _os.path.splitext(basename)[1]
-        
+
         else:
             return Base.__getattr__(self, name)
-    
+
     def as_posix(self):
-        """ Return the string representation of the path with forward slashes (`/`).
-        
+        """Return the string representation of the path with forward slashes (`/`).
+
         Returns:
             str: The string representation of the path with forward slashes (`/`).
         """
@@ -198,40 +206,38 @@ class Path(Base):
 
         if parts[0] == ".":
             self._path = _os.path.join(_os.path.abspath("."), *parts[1:])
-        
+
         return Path(self._path)
-    
+
     # WORKS (needs testing for symlinks)
     def resolve(self):
-        """ Make the path absolute, resolving all symlinks on the way and also
+        """Make the path absolute, resolving all symlinks on the way and also
         normalizing it (for example turning slashes into backslashes under
-        Windows). 
+        Windows).
 
         Returns:
             Path: A new 'Path' object with the resolved path.
         """
         return Path(_os.path.abspath(_os.path.normpath(self._path)))
-    
-    # WORKS
+
     def expanduser(self):
-        """ Expand ~ and ~user constructions. If user or $HOME is unknown, do nothing. 
+        """Expand ~ and ~user constructions. If user or $HOME is unknown, do nothing.
 
         Returns:
             Path: A new 'Path' object with the expanded user path.
-        """        
+        """
         return Path(_os.path.expanduser(self._path))
 
-    # WORKS
     def exists(self):
-        """ Whether this path exists.
+        """Whether this path exists.
 
         Returns:
-            bool: True if the path exists, False otherwise. 
+            bool: True if the path exists, False otherwise.
         """
         return _os.path.exists(str(Path(self._path).resolve()))
 
     def glob(self, pattern):
-        """ Iterate over this subtree and yield all existing files (of any
+        """Iterate over this subtree and yield all existing files (of any
         kind, including directories) matching the given relative pattern.
 
         Args:
@@ -241,15 +247,15 @@ class Path(Base):
             list: A list of 'Path' objects matching the pattern.
         """
         pattern = Path(self._path).resolve() / pattern
-        
+
         return _glob.glob(pattern)
-    
-    def unlink(self, missing_ok=1==0):
-        """ Remove this file or link.  If the path is a directory, use rmdir() instead. 
-        
+
+    def unlink(self, missing_ok=1 == 0):
+        """Remove this file or link.  If the path is a directory, use rmdir() instead.
+
         Raises:
             OSError: If the path is a directory and `missing_ok` is False.
-            
+
         Returns:
             None: No return value.
         """
@@ -260,24 +266,23 @@ class Path(Base):
                 raise
 
     def read_bytes(self):
-        """ Open the file in bytes mode, read it, and close the file.
+        """Open the file in bytes mode, read it, and close the file.
 
         Returns:
             bytes: The data read from the file.
         """
-        return self._safe_read(self._path, mode='rb')
-        
+        return self._safe_read(self._path, mode="rb")
+
     def read_text(self, mode="r"):
-        """ Open the file in text mode, read it, and close the file.
+        """Open the file in text mode, read it, and close the file.
 
         Returns:
             str: The data read from the file.
         """
-        return self._safe_read(self._path, mode='r')
-
+        return self._safe_read(self._path, mode="r")
 
     def write_bytes(self, data):
-        """ Open the file in bytes mode, write to it, and close the file.
+        """Open the file in bytes mode, write to it, and close the file.
 
         Args:
             data (bytes): The data to write to the file.
@@ -288,7 +293,7 @@ class Path(Base):
         self._safe_write(self._path, data, mode="wb")
 
     def write_text(self, data):
-        """ Open the file in text mode, write to it, and close the file.
+        """Open the file in text mode, write to it, and close the file.
 
         Args:
             data (str): The data to write to the file.
@@ -297,7 +302,6 @@ class Path(Base):
             None: No return value.
         """
         self._safe_write(self._path, data, mode="w")
-
 
     def _safe_read(self, filename, mode="r"):
         """Wrapper around the classic `open` function which makes sure to always
@@ -338,7 +342,7 @@ class Path(Base):
                 file = open(filename, mode)
                 file.write(str(data))
             except Exception:
-                raise 
+                raise
         finally:
             try:
                 file.close()  # type: ignore
@@ -346,26 +350,31 @@ class Path(Base):
                 pass
 
     def is_file(self):
-        """ Whether this path is a file.
+        """Whether this path is a file.
 
         Returns:
-            bool: True if the path is a file, False otherwise. 
+            bool: True if the path is a file, False otherwise.
         """
         return _os.path.isfile(str(self.resolve()))
 
     def is_dir(self):
-        """ Whether this path is a directory.
+        """Whether this path is a directory.
 
         Returns:
-            bool: True if the path is a directory, False otherwise. 
+            bool: True if the path is a directory, False otherwise.
         """
         return _os.path.isdir(str(self.resolve()))
 
+
 class PathTestCase(_unittest.TestCase):
     def test_creation(self):
-        self.assertEqual(str(Path("/", "tmp", "", "test.py")), "%stmp%stest.py" % (_os.sep, _os.sep))
-        self.assertEqual(str(Path("/tmp/test.py")), "%stmp%stest.py" % (_os.sep, _os.sep))
-        
+        self.assertEqual(
+            str(Path("/", "tmp", "", "test.py")), "%stmp%stest.py" % (_os.sep, _os.sep)
+        )
+        self.assertEqual(
+            str(Path("/tmp/test.py")), "%stmp%stest.py" % (_os.sep, _os.sep)
+        )
+
     def test_dots(self):
         self.assertEqual(str(Path(".")), ".")
         self.assertEqual(str(Path("./..")), "..")
@@ -379,19 +388,23 @@ class PathTestCase(_unittest.TestCase):
     def test_method_as_posix(self):
         self.assertEqual(Path("/tmp/file.txt").as_posix(), "/tmp/file.txt")
         self.assertEqual(Path("\\tmp\\file.txt").as_posix(), "/tmp/file.txt")
-        self.assertEqual(Path("C:\\Users\\MyUser\\Desktop").as_posix(), "C:/Users/MyUser/Desktop")
+        self.assertEqual(
+            Path("C:\\Users\\MyUser\\Desktop").as_posix(), "C:/Users/MyUser/Desktop"
+        )
         self.assertEqual(Path("\\Path\\To\\Resource").as_posix(), "/Path/To/Resource")
 
     def test_method_repr(self):
         assert repr(Path(".")).endswith("Path('.')")
         assert repr(Path("/tmp/test")).endswith("Path('/tmp/test')")
         assert repr(Path("./sub_dir/file.txt")).endswith("Path('sub_dir/file.txt')")
-        
+
         if pathlib_available:
             self.assertEqual(repr(Path(".")), repr(_Path(".")))
             self.assertEqual(repr(Path("/tmp/test")), repr(_Path("/tmp/test")))
-            self.assertEqual(repr(Path("./sub_dir/file.txt")), repr(_Path("./sub_dir/file.txt")))
-    
+            self.assertEqual(
+                repr(Path("./sub_dir/file.txt")), repr(_Path("./sub_dir/file.txt"))
+            )
+
     def test_method_str(self):
         self.assertEqual(str(Path("/tmp").as_posix()), "/tmp")
         self.assertEqual(str(Path("/tmp/").as_posix()), "/tmp")
@@ -401,11 +414,17 @@ class PathTestCase(_unittest.TestCase):
     def test_method_expanduser(self):
         if "HOME" in _os.environ.keys():
             self.assertEqual(str(Path("~").expanduser()), _os.environ["HOME"])
-            
+
         if pathlib_available:
             self.assertEqual(str(Path("~").expanduser()), str(_Path("~").expanduser()))
-            self.assertEqual(str(Path("~/tmp/test").expanduser()), str(_Path("~/tmp/test").expanduser()))
-            self.assertEqual(str(Path("~/sub_dir/../file.txt").expanduser()), str(_Path("~/sub_dir/../file.txt").expanduser()))
+            self.assertEqual(
+                str(Path("~/tmp/test").expanduser()),
+                str(_Path("~/tmp/test").expanduser()),
+            )
+            self.assertEqual(
+                str(Path("~/sub_dir/../file.txt").expanduser()),
+                str(_Path("~/sub_dir/../file.txt").expanduser()),
+            )
 
     def test_method_exists(self):
         self.assertEqual(Path(".").exists(), 1 == 1)
@@ -442,7 +461,7 @@ class PathTestCase(_unittest.TestCase):
         self.assertEqual(str(Path("/tmp/test/..").stem), "..")
         self.assertEqual(str(Path("/tmp/test/../").stem), "..")
         self.assertEqual(str(Path("/tmp/test/.").stem), "test")
-    
+
     def test_property_suffix(self):
         self.assertEqual(str(Path(".").suffix), "")
         self.assertEqual(str(Path("..").suffix), "")
@@ -466,13 +485,16 @@ class PathTestCase(_unittest.TestCase):
     def test_is_dir(self):
         self.assertEqual(Path(".").is_dir(), 1 == 1)
         self.assertEqual(Path("..").is_dir(), 1 == 1)
-    
+
     def test_is_file(self):
         self.assertEqual(Path(".").is_file(), 1 == 0)
         self.assertEqual(Path("..").is_file(), 1 == 0)
         self.assertEqual(Path("README.md").is_file(), 1 == 1)
-        self.assertEqual(Path("src", "polyfills", "pathlib", "__init__.py").is_file(), 1 == 1)
-        
+        self.assertEqual(
+            Path("src", "polyfills", "pathlib", "__init__.py").is_file(), 1 == 1
+        )
+
+
 if __name__ == "__main__":
     _globals = globals()
 
@@ -488,7 +510,7 @@ if __name__ == "__main__":
 
     # Find all the test methods from the classes found before and initialize the TestCase classes with those methods
     tests = [
-        test_case(test_method) 
+        test_case(test_method)
         for test_case in test_cases
         for test_method in dir(test_case)
         if test_method.startswith("test_")
