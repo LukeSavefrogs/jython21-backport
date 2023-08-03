@@ -345,6 +345,21 @@ class Path(Base):
             except:
                 pass
 
+    def is_file(self):
+        """ Whether this path is a file.
+
+        Returns:
+            bool: True if the path is a file, False otherwise. 
+        """
+        return _os.path.isfile(str(self.resolve()))
+
+    def is_dir(self):
+        """ Whether this path is a directory.
+
+        Returns:
+            bool: True if the path is a directory, False otherwise. 
+        """
+        return _os.path.isdir(str(self.resolve()))
 
 class PathTestCase(_unittest.TestCase):
     def test_creation(self):
@@ -448,7 +463,16 @@ class PathTestCase(_unittest.TestCase):
         self.assertEqual(str(Path("/tmp/test.txt.tar.gz/../").suffix), "")
         self.assertEqual(str(Path("/tmp/test.txt.tar.gz/.").suffix), ".gz")
 
-
+    def test_is_dir(self):
+        self.assertEqual(Path(".").is_dir(), 1 == 1)
+        self.assertEqual(Path("..").is_dir(), 1 == 1)
+    
+    def test_is_file(self):
+        self.assertEqual(Path(".").is_file(), 1 == 0)
+        self.assertEqual(Path("..").is_file(), 1 == 0)
+        self.assertEqual(Path("README.md").is_file(), 1 == 1)
+        self.assertEqual(Path("src", "polyfills", "pathlib", "__init__.py").is_file(), 1 == 1)
+        
 if __name__ == "__main__":
     _globals = globals()
 
