@@ -21,7 +21,7 @@ This package provides backporting for the following features:
 - [**`collections.OrderedDict()`**](src/polyfills/collections/) (`Python>=2.7`)
 - [**`json`**](src/polyfills/json/) module (`Python>=2.6`)
 - [**`logging`**](src/polyfills/logging/) module (`Python>=2.3`)
-- [**`print()`**](src/polyfills/stdlib/) function (keyword arguments such as `end` or `sep` were added in `Python 3.3`)
+- [**`print()`**](src/polyfills/stdlib/) function (keyword arguments such as `end` or `sep` were added in `Python 3.3`, see module docstring for more details)
 
 ## Tests
 
