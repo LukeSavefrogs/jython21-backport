@@ -4,8 +4,8 @@ This module contains types that will be part of the standard library in newer ve
 
 Currently 2 types are supported:
 
-- `bool` (which became available from Python 2.3)
-- `dict`
+- [`bool`](bool.py) (which became available from Python 2.3)
+- [`dict`](dict.py)
 
 ## Boolean values
 

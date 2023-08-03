@@ -15,12 +15,13 @@ Supported Python implementation:
 This package provides backporting for the following features:
 
 - [**`pathlib.Path()`**](src/polyfills/pathlib/) (`Python>=3.4`)
-- [**`bool`**](src/polyfills/stdlib/future_types/bool.py) (`Python>=2.3`)
-- [**`dict`**](src/polyfills/stdlib/future_types/dict.py)
+- [**`bool()`**](src/polyfills/stdlib/future_types/) class (`Python>=2.3`) as well as `True` and `False` ([`Python>=2.3`](https://giedrius.blog/2018/01/04/what-is-actually-true-and-false-in-python/))
+- [**`dict()`**](src/polyfills/stdlib/future_types/) class
 - [**`sorted()`**](src/polyfills/stdlib/) (`Python>=2.4`)
 - [**`collections.OrderedDict()`**](src/polyfills/collections/) (`Python>=2.7`)
 - [**`json`**](src/polyfills/json/) module (`Python>=2.6`)
 - [**`logging`**](src/polyfills/logging/) module (`Python>=2.3`)
+- [**`print()`**](src/polyfills/stdlib/) function (keyword arguments such as `end` or `sep` were added in `Python 3.3`)
 
 ## Tests
 
