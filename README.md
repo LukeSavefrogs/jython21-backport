@@ -20,6 +20,7 @@ This package provides backporting for the following features:
 - [**`sorted()`**](src/polyfills/stdlib/) (`Python>=2.4`)
 - [**`collections.OrderedDict()`**](src/polyfills/collections/) (`Python>=2.7`)
 - [**`json`**](src/polyfills/json/) module (`Python>=2.6`)
+- [**`logging`**](src/polyfills/logging/) module (`Python>=2.3`)
 
 ## Tests
 
