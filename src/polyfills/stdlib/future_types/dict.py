@@ -1,6 +1,14 @@
 import sys as _sys
 import unittest as _unittest
 
+try:
+    NotImplementedError
+except NameError:
+    try:
+        from polyfills.stdlib.exceptions import NotImplementedError
+    except ImportError:
+        class NotImplementedError(RuntimeError):
+            """ An error to be raised when a function is not implemented. """
 
 # TODO: Check if `class dict(type({}))` works:
 class dict:
@@ -156,7 +164,7 @@ class dict:
         return self.__dict__.pop(*args, **kwargs)
 
     def popitem(self):
-        return self.__dict__.popitem()
+        raise NotImplementedError("{}.popitem() is not implemented".format(self.__class__.__name__))
 
     def setdefault(self, key, default=None):
         """ If key is in the dictionary, return its value. 
@@ -303,9 +311,11 @@ class _DictTestCase(_unittest.TestCase):
         self.assertEqual(d.pop("third", None), None)
     
     def test_popitem(self):
-        d = dict(first=1, second=2)
-        self.assertEqual(d.popitem(), ("second", 2))
-        self.assertEqual(d, {"first": 1})
+        self.assertRaises(NotImplementedError, lambda: dict().popitem())
+        
+        # d = dict(first=1, second=2)
+        # self.assertEqual(d.popitem(), ("second", 2))
+        # self.assertEqual(d, {"first": 1})
     
     def test_setdefault(self):
         d = dict(first=1, second=2)
