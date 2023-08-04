@@ -160,8 +160,9 @@ class dict:
     def keys(self, *args, **kwargs):
         return self.__dict__.keys(*args, **kwargs)
 
+    # TODO: Implement a custom method for dict.pop
     def pop(self, *args, **kwargs):
-        return self.__dict__.pop(*args, **kwargs)
+        raise NotImplementedError("%s.pop() is not implemented" % self.__class__.__name__)
 
     def popitem(self):
         raise NotImplementedError("%s.popitem() is not implemented" % self.__class__.__name__)
@@ -322,9 +323,7 @@ class _DictTestCase(_unittest.TestCase):
 
     def test_pop(self):
         d = dict(first=1, second=2)
-        self.assertEqual(d.pop("first"), 1)
-        self.assertEqual(d, {"second": 2})
-        self.assertEqual(d.pop("third", None), None)
+        self.assertRaises(NotImplementedError, lambda: d.pop("first"))
     
     def test_popitem(self):
         self.assertRaises(NotImplementedError, lambda: dict().popitem())
