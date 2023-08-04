@@ -164,7 +164,7 @@ class dict:
         return self.__dict__.pop(*args, **kwargs)
 
     def popitem(self):
-        raise NotImplementedError("{}.popitem() is not implemented".format(self.__class__.__name__))
+        raise NotImplementedError("%s.popitem() is not implemented" % self.__class__.__name__)
 
     def setdefault(self, key, default=None):
         """ If key is in the dictionary, return its value. 
