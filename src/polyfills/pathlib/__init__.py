@@ -14,6 +14,7 @@ try:
     from pathlib import Path as _Path
 except ImportError:
     pathlib_available = 0
+    _Path = None
 else:
     pathlib_available = 1
 
@@ -415,7 +416,7 @@ class PathTestCase(_unittest.TestCase):
         if "HOME" in _os.environ.keys():
             self.assertEqual(str(Path("~").expanduser()), _os.environ["HOME"])
 
-        if pathlib_available:
+        if pathlib_available and getattr(_Path, "expanduser", None) is not None:
             self.assertEqual(str(Path("~").expanduser()), str(_Path("~").expanduser()))
             self.assertEqual(
                 str(Path("~/tmp/test").expanduser()),
