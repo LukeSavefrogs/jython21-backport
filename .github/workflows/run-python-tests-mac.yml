@@ -14,12 +14,6 @@ jobs:
         os: 
           - macos-latest
         python_version:
-        # See issue #9 for more information
-        #   - "2.7.17"
-        #   - "2.7.18"
-          - "3.2.5"
-          - "3.3.5"
-          - "3.4.4"
           - "3.5.4"
           - "3.5.10"
           - "3.6.7"
@@ -33,10 +27,6 @@ jobs:
           - "3.10.11"
           - "3.11.0"
           - "3.11.3"
-        # Exclude Python versions that are not supported on the OS
-        # exclude:
-        #   - os: ubuntu-20.04
-        #     python_version: "3.2.5"
     runs-on: ${{ matrix.os }}
     steps:
       - name: "Checkout"
