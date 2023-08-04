@@ -1,0 +1,66 @@
+# https://search.maven.org/artifact/org.python/jython
+# https://search.maven.org/artifact/org.python/jython-installer
+# https://search.maven.org/artifact/org.python/jython-standalone
+# https://search.maven.org/artifact/org.python/jython-slim
+
+# https://sourceforge.net/projects/jython/files/jython/
+
+# Workflow inspired by:
+#    https://github.com/jython/jython/blob/master/.github/workflows/launcher-test.yml
+name: "Jython tests (Windows)"
+
+run-name: "Run Jython tests on Windows"
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: "Test"
+    strategy:
+      fail-fast: false
+      matrix:
+        os: 
+          - windows-latest
+        jython_version: 
+          - "2.7.3"
+          - "2.7.2"
+          - "2.7.1"
+          - "2.7.0"
+          - "2.5.3"
+          - "2.5.2"
+          - "2.5.1"
+          - "2.5.0"
+          - "2.2.1"
+          - "2.2"
+        include:
+          - os: windows-latest
+            jython_version: "2.1"
+        #   - os: windows-latest
+        #     jython_version: "2.0"
+              
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Jython ${{ matrix.jython_version }}
+        uses: LukeSavefrogs/setup-jython@v3
+        with:
+          jython-version: "${{ matrix.jython_version }}"
+
+      - name: Run Jython
+        # if: ${{ ! runner.os == 'Windows' }}
+        run: |
+          jython ./scripts/run_tests.py --verbose --pattern "*.py" --start-directory "./src/polyfills/"
+      
+    #   - name: Run Jython (Windows)
+    #     if: ${{ runner.os == 'Windows' }}
+    #     shell: pwsh
+    #     run: |
+    #       echo "$env:PATH"
+    #       echo "$env:GITHUB_PATH"
+    #       jython ./scripts/run_tests.py --verbose --pattern "*.py" --start-directory "./src/polyfills/"

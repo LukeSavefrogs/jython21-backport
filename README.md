@@ -1,7 +1,12 @@
 # Jython 2.1 backporting
 
-[![CPython tests](https://github.com/LukeSavefrogs/jython21-backport/actions/workflows/run-python-tests.yml/badge.svg)](https://github.com/LukeSavefrogs/jython21-backport/actions/workflows/run-python-tests.yml)
-[![Jython tests](https://github.com/LukeSavefrogs/jython21-backport/actions/workflows/run-jython-tests.yml/badge.svg)](https://github.com/LukeSavefrogs/jython21-backport/actions/workflows/run-jython-tests.yml)
+[![CPython tests](https://github.com/LukeSavefrogs/jython21-backport/actions/workflows/run-python-tests-lin.yml/badge.svg)](https://github.com/LukeSavefrogs/jython21-backport/actions/workflows/run-python-tests-lin.yml)
+[![CPython tests](https://github.com/LukeSavefrogs/jython21-backport/actions/workflows/run-python-tests-mac.yml/badge.svg)](https://github.com/LukeSavefrogs/jython21-backport/actions/workflows/run-python-tests-mac.yml)
+[![CPython tests](https://github.com/LukeSavefrogs/jython21-backport/actions/workflows/run-python-tests-win.yml/badge.svg)](https://github.com/LukeSavefrogs/jython21-backport/actions/workflows/run-python-tests-win.yml)
+
+[![Jython tests](https://github.com/LukeSavefrogs/jython21-backport/actions/workflows/run-jython-tests-lin.yml/badge.svg)](https://github.com/LukeSavefrogs/jython21-backport/actions/workflows/run-jython-tests-lin.yml)
+[![Jython tests](https://github.com/LukeSavefrogs/jython21-backport/actions/workflows/run-jython-tests-mac.yml/badge.svg)](https://github.com/LukeSavefrogs/jython21-backport/actions/workflows/run-jython-tests-mac.yml)
+[![Jython tests](https://github.com/LukeSavefrogs/jython21-backport/actions/workflows/run-jython-tests-win.yml/badge.svg)](https://github.com/LukeSavefrogs/jython21-backport/actions/workflows/run-jython-tests-win.yml)
 
 Collection of features present in **newer Python** versions (`v2.x`, `v3.x`) backported to **legacy Python versions** (tested down to `v2.1`).
 

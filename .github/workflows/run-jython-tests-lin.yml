@@ -7,9 +7,9 @@
 
 # Workflow inspired by:
 #    https://github.com/jython/jython/blob/master/.github/workflows/launcher-test.yml
-name: "Jython tests"
+name: "Jython tests (Linux)"
 
-run-name: "Run Jython tests"
+run-name: "Run Jython tests on Linux"
 
 on:
   push:
@@ -23,8 +23,6 @@ jobs:
       matrix:
         os: 
           - ubuntu-latest
-          - windows-latest
-          - macos-latest
         jython_version: 
           - "2.7.3"
           - "2.7.2"
@@ -36,11 +34,6 @@ jobs:
           - "2.5.0"
           - "2.2.1"
           - "2.2"
-        include:
-          - os: windows-latest
-            jython_version: "2.1"
-        #   - os: windows-latest
-        #     jython_version: "2.0"
               
     runs-on: ${{ matrix.os }}
     defaults:
