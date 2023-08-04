@@ -192,7 +192,23 @@ class dict:
         Returns:
             None: No return
         """
-        return self.__dict__.update(*args, **kwargs)
+        for key, value in kwargs.items():
+            self.__dict__[key] = value
+        
+        for arg in args:
+            if type(arg) == type([]) or type(arg) == type(()):
+                
+                if type(arg) != type([]) and type(arg) != type(()):
+                    raise TypeError("update(): argument must be an iterable of length 2")
+                
+                for key, value in arg:
+                    self.__dict__[key] = value
+
+            elif type(arg) == type({}):
+                for key, value in arg.items():
+                    self.__dict__[key] = value
+            else:
+                raise TypeError("update(): argument must be an iterable or a dictionary")
 
     def values(self):
         """ Return a list of the dictionary's values.
@@ -343,6 +359,9 @@ class _DictTestCase(_unittest.TestCase):
         self.assertEqual(d, {"first": 3, "second": 2, "third": 3})
         d.update((("first", 1), ("second", 2), ("third", 3)))
         self.assertEqual(d, {"first": 1, "second": 2, "third": 3})
+
+        d.update(keyword="argument", other="argument2")
+        self.assertEqual(d, {"first": 1, "second": 2, "third": 3, "keyword": "argument", "other": "argument2"})
 
     def test_values(self):
         d = dict(first=1, second=2)
