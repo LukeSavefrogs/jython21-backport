@@ -14,9 +14,10 @@ jobs:
         os: 
           - ubuntu-20.04
           - windows-latest
-        python_version: 
-          - "2.7.17"
-          - "2.7.18"
+        python_version:
+        # See issue #9 for more information
+        #   - "2.7.17"
+        #   - "2.7.18"
           - "3.2.5"
           - "3.3.5"
           - "3.4.4"
