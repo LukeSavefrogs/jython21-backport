@@ -196,6 +196,12 @@ class bool:
 
     def __invert__(self):
         return self.__class__(not self.value)
+    
+    def __int__(self):
+        return int(self.value)
+    
+    def __float__(self):
+        return float(self.value)
 
 
 # Locally, `True` and `False` are never redefined, since they are keywords.
@@ -270,6 +276,14 @@ class _BooleanTestCase(_unittest.TestCase):
         self.assertNotEqual(self._True, 1 == 0)
         self.assertNotEqual(1 == 1, self._False)
         self.assertNotEqual(1 == 0, self._True)
+    
+    def test_int(self):
+        self.assertEqual(int(self._True), 1)
+        self.assertEqual(int(self._False), 0)
+
+    def test_float(self):
+        self.assertEqual(float(self._True), 1.0)
+        self.assertEqual(float(self._False), 0.0)
 
 
 if __name__ == "__main__":
