@@ -204,10 +204,10 @@ class bool:
         return float(self.value)
 
 
-# Locally, `True` and `False` are never redefined, since they are keywords.
-try:
-    (True, False) # pyright: ignore[reportUnusedExpression]
-except NameError:
+# - Jython 2.1: `True` and `False` are NOT DEFINED
+# - Jython 2.2: `True` and `False` are set to `1` and `0` respectively
+# - Jython 2.3+: `True` and `False` are set to `bool(1)` and `bool(0)` respectively
+if str(1 == 1) != "True" or str(1 == 0) != "False":
     # Run inside `exec` to bypass the `SyntaxError` that would be shown by modern IDEs.
     exec("True = bool(1); False = bool(0)")
 
