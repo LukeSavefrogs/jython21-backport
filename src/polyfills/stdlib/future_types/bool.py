@@ -285,6 +285,14 @@ class _BooleanTestCase(_unittest.TestCase):
         self.assertEqual(float(self._True), 1.0)
         self.assertEqual(float(self._False), 0.0)
 
+    def test_str(self):
+        self.assertEqual(str(self._True), "True")
+        self.assertEqual(str(self._False), "False")
+
+    def test_repr(self):
+        self.assertEqual(repr(self._True), "True")
+        self.assertEqual(repr(self._False), "False")
+
 
 if __name__ == "__main__":
     _globals = globals()
