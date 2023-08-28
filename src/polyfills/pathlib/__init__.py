@@ -14,7 +14,6 @@ try:
     from pathlib import Path as _Path
 except ImportError:
     pathlib_available = 0
-    _Path = None
 else:
     pathlib_available = 1
 
@@ -180,7 +179,9 @@ class Path(Base):
             return _os.path.splitext(basename)[1]
 
         else:
-            return Base.__getattr__(self, name)
+            raise AttributeError(
+                "'%s' object has no attribute '%s'" % (self.__class__, name)
+            )
 
     def as_posix(self):
         """Return the string representation of the path with forward slashes (`/`).
