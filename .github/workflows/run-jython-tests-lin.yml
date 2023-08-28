@@ -51,11 +51,3 @@ jobs:
         # if: ${{ ! runner.os == 'Windows' }}
         run: |
           jython ./scripts/run_tests.py --verbose --pattern "*.py" --start-directory "./src/polyfills/"
-      
-    #   - name: Run Jython (Windows)
-    #     if: ${{ runner.os == 'Windows' }}
-    #     shell: pwsh
-    #     run: |
-    #       echo "$env:PATH"
-    #       echo "$env:GITHUB_PATH"
-    #       jython ./scripts/run_tests.py --verbose --pattern "*.py" --start-directory "./src/polyfills/"
