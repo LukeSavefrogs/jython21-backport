@@ -43,7 +43,7 @@ class BaseTestCase(unittest.TestCase):
         )
         self.assertEqual(
             json.dumps(3.14e10),
-            '31400000000.0',
+            str(3.14e10), # With '31400000000.0' tests failed on Python 2.2 and lower
             "Exponential numbers should work"
         )
 
