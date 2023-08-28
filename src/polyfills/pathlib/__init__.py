@@ -434,14 +434,14 @@ class PathTestCase(_unittest.TestCase):
         self.assertEqual(Path("~").expanduser().exists(), 1 == 1)
 
     def test_property_parent(self):
-        self.assertEqual(Path(".").parent.as_posix(), ".")
-        self.assertEqual(Path("..").parent.as_posix(), ".")
-        self.assertEqual(Path("/tmp").parent.as_posix(), "/")
-        self.assertEqual(Path("/tmp/test").parent.as_posix(), "/tmp")
-        self.assertEqual(Path("/tmp/test/").parent.as_posix(), "/tmp")
-        self.assertEqual(Path("/tmp/test/.").parent.as_posix(), "/tmp")
-        self.assertEqual(Path("/tmp/test/..").parent.as_posix(), "/tmp/test")
-        self.assertEqual(Path("/tmp/test/../").parent.as_posix(), "/tmp/test")
+        self.assertEqual(Path(".").parent.as_posix(), ".")                      # pyright: ignore[reportGeneralTypeIssues]
+        self.assertEqual(Path("..").parent.as_posix(), ".")                     # pyright: ignore[reportGeneralTypeIssues]
+        self.assertEqual(Path("/tmp").parent.as_posix(), "/")                   # pyright: ignore[reportGeneralTypeIssues]
+        self.assertEqual(Path("/tmp/test").parent.as_posix(), "/tmp")           # pyright: ignore[reportGeneralTypeIssues]
+        self.assertEqual(Path("/tmp/test/").parent.as_posix(), "/tmp")          # pyright: ignore[reportGeneralTypeIssues]
+        self.assertEqual(Path("/tmp/test/.").parent.as_posix(), "/tmp")         # pyright: ignore[reportGeneralTypeIssues]
+        self.assertEqual(Path("/tmp/test/..").parent.as_posix(), "/tmp/test")   # pyright: ignore[reportGeneralTypeIssues]
+        self.assertEqual(Path("/tmp/test/../").parent.as_posix(), "/tmp/test")  # pyright: ignore[reportGeneralTypeIssues]
 
     def test_property_name(self):
         self.assertEqual(str(Path(".").name), ".")
