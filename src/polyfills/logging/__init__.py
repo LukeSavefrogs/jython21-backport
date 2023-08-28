@@ -22,7 +22,7 @@ except ImportError:
     pass
 
 try:
-    import warnings
+    import warnings as _warnings
 except ImportError:
     pass
 
@@ -366,7 +366,7 @@ def warning(msg, *args, **kwargs):
 
 def warn(msg, *args, **kwargs):
     try:
-        warnings.warn(
+        _warnings.warn(
             "The 'warn' function is deprecated, " "use 'warning' instead",
             DeprecationWarning,
             2,
