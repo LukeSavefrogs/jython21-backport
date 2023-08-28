@@ -76,17 +76,16 @@ class Path(Base):
     """
 
     _path = ""
-    _flavour = None
 
     def __init__(self, *args, **kwargs):
-        # Ensure the os module is always loaded, even if the class is copied
-        exec("import os as _os")
+        converted_args = list(map(str, args))
+
         if _os.name == "nt":
             self._flavour = _WindowsFlavour()
-            self._path = _os.path.join(*args).replace("/", self._flavour.sep)
+            self._path = _os.path.join(*converted_args).replace("/", self._flavour.sep)
         else:
             self._flavour = _PosixFlavour()
-            self._path = _os.path.join(*args)
+            self._path = _os.path.join(*converted_args)
 
         if self.as_posix().startswith("./"):
             self._path = self._path[2:]
