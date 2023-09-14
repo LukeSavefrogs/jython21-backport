@@ -238,6 +238,7 @@ class Path(Base):
         return _os.path.exists(str(Path(self._path).resolve()))
 
     def glob(self, pattern):
+        # type: (str) -> list[str]
         """Iterate over this subtree and yield all existing files (of any
         kind, including directories) matching the given relative pattern.
 
@@ -247,7 +248,7 @@ class Path(Base):
         Returns:
             list: A list of 'Path' objects matching the pattern.
         """
-        pattern = Path(self._path).resolve() / pattern
+        pattern = str(Path(self._path).resolve() / pattern)
 
         return _glob.glob(pattern)
 
