@@ -239,6 +239,11 @@ def loads(
             elif char in ["}", "]"]:
                 last_bracket = nesting_levels.pop()
 
+                # Support for empty objects
+                if len(last_key) == 0 and len(nesting_levels) == 0:
+                    result = {}
+                    continue
+
                 if len(last_key) != 2:
                     raise Exception("Unexpected key tuple length: %s" % str(last_key))
                 
