@@ -149,6 +149,8 @@ def loads(
 
     Args:
         json_str (str): A JSON string.
+        truthy_value (bool, optional): The value to use for boolean `true`. Defaults to None.
+        falsy_value (bool, optional): The value to use for boolean `false`. Defaults to None.
 
     Returns:
         Any: A Python object corresponding to the JSON string.
