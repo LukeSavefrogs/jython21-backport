@@ -496,11 +496,20 @@ def loads(
 
 def load(
         fh,
-        json_str, # type: str
         truthy_value=None, 
         falsy_value=None
     ):
-    fh.write(loads(json_str, truthy_value, falsy_value))
+    """ Deserialize fp (a `.read()`-supporting text file or binary file containing a JSON document) to a Python object.
+    
+    Args:
+        fh (file): A File-like object.
+        truthy_value (bool, optional): The value to use for boolean `true`. Defaults to None.
+        falsy_value (bool, optional): The value to use for boolean `false`. Defaults to None.
+
+    Returns:
+        Any: The deserialized Python object.
+    """
+    return loads(fh.read(), truthy_value, falsy_value)
     
 
 def dump(
