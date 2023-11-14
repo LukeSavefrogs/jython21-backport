@@ -23,6 +23,7 @@ This package provides backporting for the following features:
 - [**`bool()`**](src/polyfills/stdlib/future_types/) class (`Python>=2.3`) as well as `True` and `False` ([`Python>=2.3`](https://giedrius.blog/2018/01/04/what-is-actually-true-and-false-in-python/))
 - [**`dict()`**](src/polyfills/stdlib/future_types/) class
 - [**`sorted()`**](src/polyfills/stdlib/) function (`Python>=2.4`)
+- [**`sum()`**](src/polyfills/stdlib/) function (`Python>=2.3`)
 - [**`collections.OrderedDict()`**](src/polyfills/collections/) (`Python>=2.7`)
 - [**`json`**](src/polyfills/json/) module (`Python>=2.6`)
 - [**`logging`**](src/polyfills/logging/) module (`Python>=2.3`)

@@ -1,5 +1,28 @@
 import unittest as _unittest
 
+def sum(
+    __iterable, # type: list[int|float]
+    start = 0   # type: int
+):
+    """ Sums all the items in the iterable, starting from the `start` value.
+    
+    This is a backport of the Python `sum` built-in function (introduced in
+    2.3) that works down to Python 2.1 (tested).
+    
+    Args:
+        __iterable (list[int|float]): The iterable to sum.
+        start (int): The value to start from.
+        
+    Returns:
+        result (int|float): The sum of all the items in the iterable.
+    """
+    result = start
+
+    for item in __iterable:
+        result += item
+
+    return result
+
 def sorted(__iterable):
     """Return a new list containing all items from the iterable in ascending
     order.
