@@ -1,6 +1,5 @@
 import unittest as _unittest
 
-
 def sorted(__iterable):
     """Return a new list containing all items from the iterable in ascending
     order.
@@ -64,6 +63,24 @@ def sorted(__iterable):
         raise Exception(
             "Unhandled type '%s' for iterable '%s'" % (item_type, __iterable)
         )
+
+
+class TestSum(_unittest.TestCase):
+    def test_int_list(self):
+        """Test summing a list of int."""
+        self.assertEqual(sum([1, 2, 3]), 6)
+
+    def test_int_tuple(self):
+        """Test summing a tuple of int."""
+        self.assertEqual(sum((1, 2, 3)), 6)
+
+    def test_float_list(self):
+        """Test summing a list of floats."""
+        self.assertEqual(round(sum([1.1, 2.1, 3.1]), 1), 6.3)
+
+    def test_float_tuple(self):
+        """Test summing a tuple of floats."""
+        self.assertEqual(round(sum((1.1, 2.1, 3.1)), 1), 6.3)
 
 
 class TestSorted(_unittest.TestCase):
