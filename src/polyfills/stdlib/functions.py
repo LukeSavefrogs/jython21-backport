@@ -36,29 +36,26 @@ def sorted(__iterable):
     Returns:
         values (list): Ordered list with all the items of the original iterable.
     """
-    item_type = type(__iterable).__name__
-    iterables = (
-        "list",
-        "org.python.core.PyList",
-        "dict",
-        "org.python.core.PyDictionary",
-        "tuple",
-        "org.python.core.PyTuple",
-    )
-
-    if item_type in ["list", "org.python.core.PyList"]:
+    item_type = type(__iterable)
+    _dict, _list, _tuple, _str = type({}), type([]), type(()), type("")
+    
+    # ---> List
+    #
+    #      When passed a list, the original `sorted` function
+    #      sorts its elements as expected.
+    if item_type == _list:
         elements = [elem for elem in __iterable]  # Make a copy of the original iterable
         elements.sort()
 
         value = []
         for element in elements:
-            if type(element).__name__ in ["tuple", "org.python.core.PyTuple"]:
+            if type(element) == _tuple:
                 value.append(element)
-            elif type(element).__name__ in ["dict", "org.python.core.PyDictionary"]:
+            elif type(element) == _dict:
                 raise TypeError(
                     "unorderable types: dict() < dict() (not supported in Python 2.1)"
                 )
-            elif type(element).__name__ in iterables:
+            elif type(element) in [_list, _dict, _tuple]:
                 value.append(sorted(element))
             else:
                 value.append(element)
@@ -69,17 +66,25 @@ def sorted(__iterable):
     #
     #      When passed a dictionary, the original `sorted` function
     #      sorts only its keys.
-    elif item_type in ["dict", "org.python.core.PyDictionary"]:
+    elif item_type == _dict:
         return sorted([value for value in __iterable.keys()])
 
-    elif item_type in ["tuple", "org.python.core.PyTuple"]:
+    # ---> Tuple
+    #
+    #      When passed a tuple, the original `sorted` function
+    #      sorts its elements even if the tuple should be immutable.
+    #       
+    #      Example:
+    #          >>> sorted((3, 2, 1))
+    #          [1, 2, 3]
+    elif item_type == _tuple:
         return sorted([value for value in __iterable])
 
     # ---> String
     #
     #      When passed a string, the original `sorted` function
     #      sorts its characters.
-    elif item_type in ["str", "org.python.core.PyString"]:
+    elif item_type == _str:
         return sorted([char for char in __iterable])
 
     else:
