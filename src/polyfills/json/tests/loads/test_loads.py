@@ -128,6 +128,21 @@ class ObjectTestCase(unittest.TestCase):
         	{"string": "value","dict": {"nested_key": "nested_value","test": True}, "last": 1}
 		)
     
+class CommentsTestCase(unittest.TestCase):
+    """ Comments are not allowed in standard JSON (only in JSON5) """
+    def test_single_line(self):
+        # self.assertEqual(
+        #     json.loads('// This is a comment'),
+        #     "",
+        # )
+        self.assertRaises(Exception, lambda: json.loads('// This is a comment'))
+
+    def test_multi_line(self):
+        # self.assertEqual(
+        #     json.loads('/* This is a comment */'),
+        #     "",
+        # )    
+        self.assertRaises(Exception, lambda: json.loads('/* This is a comment */'))
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
