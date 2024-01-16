@@ -41,7 +41,7 @@ def batched(iterable, length):
         for i in range(0, len(iterable), length)
     ]
 
-    if type(iterable) in (type(""), type(u"")):
+    if type(iterable) in [type("")]:
         return batched_data
 
     return [tuple(_elem) for _elem in batched_data]
