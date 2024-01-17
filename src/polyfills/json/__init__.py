@@ -15,6 +15,20 @@ if not IS_BOOLEAN_DEFINED:
 
 __all__ = ["dumps", "dump", "loads", "load"]
 
+def escape_string(string):
+    # type: (str) -> str
+    """Escapes a string so that it can be used as a JSON string.
+
+    Args:
+        string (str): The string to escape.
+
+    Returns:
+        str: The escaped string.
+    """
+    return string \
+        .replace("\\", "\\\\") \
+        .replace('"', '\\"')
+
 def dumps(
         obj,
         indent=None,          # type: int|None
@@ -58,7 +72,17 @@ def dumps(
             if len(obj_string_parts) > 1:
                 obj_string_parts[-1] += ", "
             value = dumps(obj[key], indent_spaces, truthy_value, falsy_value)
-            obj_string_parts.append('"%s": %s' % (str(key), str(value)))
+            parsed_key = dumps(key)
+            
+            # Remove quotes from the parsed key, because we will add them
+            #   manually later.
+            if parsed_key.startswith('"') and parsed_key.endswith('"'):
+                parsed_key = parsed_key[1:-1]
+
+            obj_string_parts.append('"%s": %s' % (
+                parsed_key,
+                str(value),
+            ))
         
         obj_string_parts.append("}")
     #endif
@@ -111,7 +135,7 @@ def dumps(
 
         # ---> Base types
         elif obj_type == type(""):
-            return '"%s"' % str(obj).replace("\\", "\\\\").replace('"', '\\"')
+            return '"%s"' % escape_string(str(obj))
         elif obj_type == type(5):
             return str(obj)
         elif obj_type == type(5.0):

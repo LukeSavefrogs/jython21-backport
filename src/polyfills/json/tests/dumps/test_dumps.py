@@ -117,6 +117,43 @@ class ObjectTestCase(unittest.TestCase):
             '{"key": "value"}'
         )
 
+    def test_conversion_keys(self):
+        self.assertEqual(
+            json.dumps({True: 1, False: 0, None: "null"}),
+            '{"true": 1, "false": 0, "null": "null"}'
+        )
+    
+    def test_quotes(self):
+        """ Quotes should be escaped (see #15) """
+        self.assertEqual(
+            json.dumps({"\"": "\""}),
+            r'{"\"": "\""}',
+            "Double quotes should be escaped both in keys and values"
+        )
+        self.assertEqual(
+            json.dumps({"'": "'"}),
+            r"""{"'": "'"}""",
+            "Single quotes should be kept as-is",
+        )
+
+    
+    def test_escape(self):
+        self.assertEqual(
+            json.dumps({"key": "va'lue"}),
+            r"""{"key": "va'lue"}""",
+            "Single quotes do not need to be escaped"
+        )
+        self.assertEqual(
+            json.dumps({'k"ey': 'va"lue'}),
+            r"""{"k\"ey": "va\"lue"}""",
+            "Double quotes should be escaped"
+        )
+        self.assertEqual(
+            json.dumps({r"k\ey": r"va\lue"}),
+            r"""{"k\\ey": "va\\lue"}""",
+            "Backslashes should be escaped both in keys and values"
+        )
+
     def test_complex(self):
         if str(1==1) == 'True':
             __true__ = 1==1
