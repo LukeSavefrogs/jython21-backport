@@ -202,6 +202,9 @@ class bool:
     
     def __float__(self):
         return float(self.value)
+    
+    def __hash__(self):
+        return hash(self.value)
 
 
 # - Jython 2.1: `True` and `False` are NOT DEFINED
@@ -293,6 +296,9 @@ class _BooleanTestCase(_unittest.TestCase):
         self.assertEqual(repr(self._True), "True")
         self.assertEqual(repr(self._False), "False")
 
+    def test_hash(self):
+        self.assertEqual(hash(self._True), hash(1))
+        self.assertEqual(hash(self._False), hash(0))
 
 if __name__ == "__main__":
     _globals = globals()
