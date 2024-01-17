@@ -119,8 +119,24 @@ class ObjectTestCase(unittest.TestCase):
 
     def test_conversion_keys(self):
         self.assertEqual(
-            json.dumps({True: 1, False: 0, None: "null"}),
-            '{"true": 1, "false": 0, "null": "null"}'
+            json.dumps({True: 1}),
+            '{"true": 1}',
+        )
+        self.assertEqual(
+            json.dumps({False: 0}),
+            '{"false": 0}',
+        )
+        self.assertEqual(
+            json.dumps({None: None}),
+            '{"null": null}',
+        )
+        self.assertEqual(
+            json.dumps({1: 1}),
+            '{"1": 1}',
+        )
+        self.assertEqual(
+            json.dumps({1.1: 1.1}),
+            '{"1.1": 1.1}',
         )
     
     def test_quotes(self):
