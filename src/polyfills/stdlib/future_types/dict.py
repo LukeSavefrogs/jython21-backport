@@ -322,8 +322,7 @@ class _DictTestCase(_unittest.TestCase):
         self.assertEqual(keys, ["first", "second"])
 
     def test_pop(self):
-        d = dict(first=1, second=2)
-        self.assertRaises(NotImplementedError, lambda: d.pop("first"))
+        self.assertRaises(NotImplementedError, lambda: dict(first=1, second=2).pop("first"))
     
     def test_popitem(self):
         self.assertRaises(NotImplementedError, lambda: dict().popitem())
