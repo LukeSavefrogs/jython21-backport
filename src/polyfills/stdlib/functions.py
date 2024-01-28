@@ -1,4 +1,9 @@
+""" Collection of functions available natively in the standard library of
+newer Python versions.
+"""
 import unittest as _unittest
+
+from polyfills.stdlib.future_types.bool import * # type: ignore # ==> Import the polyfills for boolean types
 
 def sum(
     __iterable, # type: list[int|float]
@@ -23,7 +28,7 @@ def sum(
 
     return result
 
-def sorted(__iterable):
+def sorted(__iterable, key=None, reverse=False):
     """Return a new list containing all items from the iterable in ascending
     order.
 
@@ -32,6 +37,8 @@ def sorted(__iterable):
 
     Args:
         item (Iterable): The iterable to sort (dictionary, tuple, list or string).
+        key (function): The function to use to sort the items.
+        reverse (bool): Whether to sort the items in reverse order.
 
     Returns:
         values (list): Ordered list with all the items of the original iterable.
@@ -45,17 +52,19 @@ def sorted(__iterable):
     #      sorts its elements as expected.
     if item_type == _list:
         elements = [elem for elem in __iterable]  # Make a copy of the original iterable
-        elements.sort()
+        elements.sort(key=key)
+        
+        # TODO: Check if possible to use `elements.sort(reverse=reverse)` instead
+        if reverse is True:
+            elements.reverse()
 
         value = []
         for element in elements:
             if type(element) == _tuple:
                 value.append(element)
             elif type(element) == _dict:
-                raise TypeError(
-                    "unorderable types: dict() < dict() (not supported in Python 2.1)"
-                )
-            elif type(element) in [_list, _dict, _tuple]:
+                value.append(element)
+            elif type(element) == _list:
                 value.append(sorted(element))
             else:
                 value.append(element)
@@ -63,7 +72,7 @@ def sorted(__iterable):
         return value
 
     # ---> Dictionary
-    #
+    # 
     #      When passed a dictionary, the original `sorted` function
     #      sorts only its keys.
     elif item_type == _dict:
@@ -111,6 +120,15 @@ class TestSum(_unittest.TestCase):
         self.assertEqual(round(sum((1.1, 2.1, 3.1)), 1), 6.3)
 
 
+class _TestClass:
+    def __init__(self, value):
+        self.value = value
+    
+    def __eq__(self, __value):
+        if type(__value) == self.__class__:
+            return self.value == __value.value
+        return self.value == __value
+
 class TestSorted(_unittest.TestCase):
     def test_list(self):
         """Test sorting a list."""
@@ -154,6 +172,52 @@ class TestSorted(_unittest.TestCase):
         else:
             self.fail("TypeError not raised")
 
+    def test_arg_key(self):
+        """Test sorting a list with a key function."""
+        self.assertEqual(sorted([-1, 3, 0, -13, 1, 2], key=lambda x: -x), [3, 2, 1, 0, -1, -13])
+        self.assertEqual(
+            sorted([{"key": 1}, {"key": 2}, {"key": 0}], key=lambda x: x["key"]),
+            [{"key": 0}, {"key": 1}, {"key": 2}],
+        )
+
+        def cmp_func(x, y):
+            if x.value < y.value:
+                return -1
+            elif x.value > y.value:
+                return 1
+            else:
+                return 0
+
+        self.assertEqual(
+            # sorted([_TestClass(1), _TestClass(2), _TestClass(0)], key=cmp_func),
+            sorted([_TestClass(1), _TestClass(2), _TestClass(0)], key=lambda x: x.value),
+            [_TestClass(0), _TestClass(1), _TestClass(2)],
+        )
+
+    def test_arg_reverse(self):
+        """Test sorting a list with a key function."""
+        self.assertEqual(
+            sorted([1, 3, 2], reverse=True),
+            [3, 2, 1]
+        )
+        self.assertEqual(
+            sorted([{"key": 1}, {"key": 2}, {"key": 0}], key=lambda x: x["key"], reverse=True),
+            [{"key": 2}, {"key": 1}, {"key": 0}]
+        )
+
+        def cmp_func(x, y):
+            if x.value < y.value:
+                return -1
+            elif x.value > y.value:
+                return 1
+            else:
+                return 0
+
+        self.assertEqual(
+            # sorted([_TestClass(1), _TestClass(2), _TestClass(0)], key=cmp_func, reverse=True),
+            sorted([_TestClass(1), _TestClass(2), _TestClass(0)], key=lambda x: x.value, reverse=True),
+            [_TestClass(2), _TestClass(1), _TestClass(0)],
+        )
 
 if __name__ == "__main__":
     _globals = globals()
