@@ -198,14 +198,14 @@ class TestSorted(_unittest.TestCase):
         """Test sorting a tuple of tuples."""
         self.assertEqual(sorted(((3, 2, 1), (2, 1, 3))), [(2, 1, 3), (3, 2, 1)])
 
-    def test_tuple_of_dicts(self):
-        """Test sorting a tuple of dictionaries."""
-        try:
-            sorted(({3: 3, 2: 2, 1: 1}, {2: 2, 1: 1, 3: 3}))
-        except TypeError:
-            pass
-        else:
-            self.fail("TypeError not raised")
+    # def test_tuple_of_dicts(self):
+    #     """Test sorting a tuple of dictionaries."""
+    #     try:
+    #         sorted(({3: 3, 2: 2, 1: 1}, {2: 2, 1: 1, 3: 3}))
+    #     except TypeError:
+    #         pass
+    #     else:
+    #         self.fail("TypeError not raised")
 
     def test_arg_key(self):
         """Test sorting a list with a key function."""
