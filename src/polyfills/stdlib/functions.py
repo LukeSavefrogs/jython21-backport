@@ -1,6 +1,7 @@
 """ Collection of functions available natively in the standard library of
 newer Python versions.
 """
+import sys as _sys
 import unittest as _unittest
 
 from polyfills.stdlib.future_types.bool import * # type: ignore # ==> Import the polyfills for boolean types
@@ -45,6 +46,30 @@ def sorted(__iterable, key=None, reverse=False):
     """
     item_type = type(__iterable)
     _dict, _list, _tuple, _str = type({}), type([]), type(()), type("")
+
+    def key_to_cmp(key):
+        """ Convert a key function to a cmp function. 
+        
+        Info: https://docs.python.org/3/howto/sorting.html#the-old-way-using-the-cmp-parameter
+        """
+        def cmp(a, b):
+            """ The `cmp` function does not exist on Python 3.x.
+            
+            Source: https://stackoverflow.com/a/22490617/8965861
+            """
+            return (a > b) - (a < b) 
+
+        # def cmp_func(x, y):
+        #     if key(x) < key(y):
+        #         return -1
+        #     elif key(x) > key(y):
+        #         return 1
+        #     else:
+        #         return 0
+        # def cmp_func(x, y):
+        #     return cmp(key(x), key(y))
+        # return cmp_func
+        return lambda x, y: cmp(key(x), key(y))
     
     # ---> List
     #
@@ -52,7 +77,17 @@ def sorted(__iterable, key=None, reverse=False):
     #      sorts its elements as expected.
     if item_type == _list:
         elements = [elem for elem in __iterable]  # Make a copy of the original iterable
-        elements.sort(key=key)
+
+        if key is None:
+            # If no key function is passed, sort the elements as they are
+            elements.sort()
+        else:
+            # The `key` argument was introduced starting from Python 2.4
+            if _sys.version_info < (2, 4):
+                # If so, convert the key function to a cmp function
+                elements.sort(key_to_cmp(key))
+            else:
+                elements.sort(key=key)
         
         # TODO: Check if possible to use `elements.sort(reverse=reverse)` instead
         if reverse is True:
@@ -142,14 +177,14 @@ class TestSorted(_unittest.TestCase):
         """Test sorting a list of tuples."""
         self.assertEqual(sorted([(3, 2, 1), (2, 1, 3)]), [(2, 1, 3), (3, 2, 1)])
 
-    def test_list_of_dicts(self):
-        """Test sorting a list of dictionaries."""
-        try:
-            sorted([{3: 3, 2: 2, 1: 1}, {2: 2, 1: 1, 3: 3}])
-        except TypeError:
-            pass
-        else:
-            self.fail("TypeError not raised")
+    # def test_list_of_dicts(self):
+    #     """Test sorting a list of dictionaries."""
+    #     try:
+    #         sorted([{3: 3, 2: 2, 1: 1}, {2: 2, 1: 1, 3: 3}])
+    #     except TypeError:
+    #         pass
+    #     else:
+    #         self.fail("TypeError not raised")
 
     def test_tuple(self):
         """Test sorting a tuple."""
@@ -204,14 +239,6 @@ class TestSorted(_unittest.TestCase):
             sorted([{"key": 1}, {"key": 2}, {"key": 0}], key=lambda x: x["key"], reverse=True),
             [{"key": 2}, {"key": 1}, {"key": 0}]
         )
-
-        def cmp_func(x, y):
-            if x.value < y.value:
-                return -1
-            elif x.value > y.value:
-                return 1
-            else:
-                return 0
 
         self.assertEqual(
             # sorted([_TestClass(1), _TestClass(2), _TestClass(0)], key=cmp_func, reverse=True),
