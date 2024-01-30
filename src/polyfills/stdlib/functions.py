@@ -1,10 +1,17 @@
 """ Collection of functions available natively in the standard library of
 newer Python versions.
 """
+from __future__ import nested_scopes
+
 import sys as _sys
 import unittest as _unittest
 
 from polyfills.stdlib.future_types.bool import * # type: ignore # ==> Import the polyfills for boolean types
+
+__all__ = [
+    "sum",
+    "sorted",
+]
 
 def sum(
     __iterable, # type: list[int|float]
@@ -83,13 +90,12 @@ def sorted(__iterable, key=None, reverse=False):
             elements.sort()
         else:
             # The `key` argument was introduced starting from Python 2.4
-            if _sys.version_info < (2, 4):
-                # If so, convert the key function to a cmp function
-                elements.sort(key_to_cmp(key))
-            else:
+            if _sys.version_info >= (2, 4):
                 elements.sort(key=key)
+            else:
+                # Convert the key function to a cmp function, since the `key` argument is not available.
+                elements.sort(key_to_cmp(key))
         
-        # TODO: Check if possible to use `elements.sort(reverse=reverse)` instead
         if reverse is True:
             elements.reverse()
 
