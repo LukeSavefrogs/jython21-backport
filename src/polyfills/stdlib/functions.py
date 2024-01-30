@@ -13,6 +13,42 @@ __all__ = [
     "sorted",
 ]
 
+def enumerate(__iterable, start=0):
+    """ It generates a sequence of tuples containing a count
+    (from start which defaults to 0) and the values obtained from
+    iterating over iterable.
+
+    This is a backport of the Python `enumerate` built-in function
+    (introduced in 2.3) that works down to Python 2.1 (tested).
+
+    Args:
+        __iterable (Iterable): The iterable to enumerate.
+        start (int): The value to start from.
+
+    Returns:
+        enumerate (zip): An enumerate object.
+    """
+    try:
+        range_func = xrange # pyright: ignore[reportUndefinedVariable]
+    except NameError:
+        range_func = range
+
+    return zip(range_func(start, start + len(__iterable)), __iterable)
+
+class EnumerateTestCase(_unittest.TestCase):
+    def test_enumerate(self):
+        """Test the `enumerate` function."""
+        self.assertEqual(
+            list(enumerate(["a", "b", "c"])),
+            [(0, "a"), (1, "b"), (2, "c")],
+            "Enumerate should work"
+        )
+        self.assertEqual(
+            list(enumerate(["a", "b", "c"], 10)),
+            [(10, "a"), (11, "b"), (12, "c")],
+            "Enumerate should work with a start value"
+        )
+
 def sum(
     __iterable, # type: list[int|float]
     start = 0   # type: int
