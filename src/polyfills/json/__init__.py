@@ -15,16 +15,20 @@ if not IS_BOOLEAN_DEFINED:
 
 __all__ = ["dumps", "dump", "loads", "load"]
 
-# From the builtin `json` module:
-ESCAPE_DCT = {
-    '\\': '\\\\',
-    '"': '\\"',
-    '\b': '\\b',
-    '\f': '\\f',
-    '\n': '\\n',
-    '\r': '\\r',
-    '\t': '\\t',
-}
+# The following list of characters is taken from the builtin `json` module.
+#
+# I used a list instead of a dictionary because on Py<=3.5 dictionaries are
+# unordered by default, which is a problem in this case since the backslash
+# may be escaped multiple times.
+ESCAPED_CHARS = [
+    {"from": '\\', "to": '\\\\'},
+    {"from": '"', "to": '\\"'},
+    {"from": '\b', "to": '\\b'},
+    {"from": '\f', "to": '\\f'},
+    {"from": '\n', "to": '\\n'},
+    {"from": '\r', "to": '\\r'},
+    {"from": '\t', "to": '\\t'},
+]
 
 
 class BaseJSONError(Exception):
@@ -43,8 +47,8 @@ def escape_string(string):
     Returns:
         str: The escaped string.
     """
-    for special_char in ESCAPE_DCT.keys():
-        string = string.replace(special_char, ESCAPE_DCT[special_char])
+    for special_char in ESCAPED_CHARS:
+        string = string.replace(special_char["from"], special_char["to"])
     
     return string
 
