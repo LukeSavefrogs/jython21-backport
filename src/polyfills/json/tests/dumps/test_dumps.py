@@ -169,6 +169,11 @@ class ObjectTestCase(unittest.TestCase):
             r"""{"k\\ey": "va\\lue"}""",
             "Backslashes should be escaped both in keys and values"
         )
+        self.assertEqual(
+            json.dumps("test\ntest"),
+            '"test\\ntest"',
+            "Newlines should be escaped"
+        )
 
     def test_complex(self):
         if str(1==1) == 'True':

@@ -15,6 +15,17 @@ if not IS_BOOLEAN_DEFINED:
 
 __all__ = ["dumps", "dump", "loads", "load"]
 
+# From the builtin `json` module:
+ESCAPE_DCT = {
+    '\\': '\\\\',
+    '"': '\\"',
+    '\b': '\\b',
+    '\f': '\\f',
+    '\n': '\\n',
+    '\r': '\\r',
+    '\t': '\\t',
+}
+
 
 class BaseJSONError(Exception):
     """ Base exception for the JSON library. """
@@ -32,9 +43,10 @@ def escape_string(string):
     Returns:
         str: The escaped string.
     """
-    return string \
-        .replace("\\", "\\\\") \
-        .replace('"', '\\"')
+    for special_char in ESCAPE_DCT.keys():
+        string = string.replace(special_char, ESCAPE_DCT[special_char])
+    
+    return string
 
 def dumps(
         obj,
