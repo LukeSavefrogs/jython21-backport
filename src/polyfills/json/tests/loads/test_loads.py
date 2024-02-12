@@ -103,6 +103,11 @@ class ArrayTestCase(unittest.TestCase):
     
 
 class ObjectTestCase(unittest.TestCase):
+    def test_empty(self):
+        self.assertEqual(
+            json.loads(r'{"key": {}}'),
+            {"key": {}}
+        )
     def test_basic(self):
         self.assertEqual(
             json.loads('{"string": "value", "key2": 1, "last": true}'),
@@ -144,5 +149,25 @@ class CommentsTestCase(unittest.TestCase):
         # )    
         self.assertRaises(Exception, lambda: json.loads('/* This is a comment */'))
 
+class InvalidJSONTestCase(unittest.TestCase):
+    """ Invalid JSON should raise an exception (see #16) """
+    def test_invalid_structure(self):
+        self.assertRaises(json.JSONDecodeError, json.loads, r"""{"}""")
+        self.assertRaises(json.JSONDecodeError, json.loads, r"""{""")
+        self.assertRaises(json.JSONDecodeError, json.loads, r"""{"key": "val}""")
+        self.assertRaises(json.JSONDecodeError, json.loads, r"""{}[]""")
+        self.assertRaises(json.JSONDecodeError, json.loads, r"""{,}""")
+        self.assertRaises(json.JSONDecodeError, json.loads, r"""[,{}]""")
+        self.assertRaises(json.JSONDecodeError, json.loads, r"""["key": "val"]""")
+        self.assertRaises(json.JSONDecodeError, json.loads, r"""["key", """)
+        self.assertRaises(json.JSONDecodeError, json.loads, r"""[""")
+
+        self.assertRaises(Exception, json.loads, r"""[string string]""")
+
+    def test_invalid_types(self):
+        self.assertRaises(Exception, json.loads, r"""undefined""")
+        self.assertRaises(Exception, json.loads, r"""random_string""")
+        
+
 if __name__ == '__main__':
-    unittest.main(verbosity=2)
+    unittest.main(verbosity=2, failfast=False)

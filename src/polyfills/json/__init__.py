@@ -15,6 +15,13 @@ if not IS_BOOLEAN_DEFINED:
 
 __all__ = ["dumps", "dump", "loads", "load"]
 
+
+class BaseJSONError(Exception):
+    """ Base exception for the JSON library. """
+
+class JSONDecodeError(BaseJSONError):
+    """ Thrown when there is an error while decoding a JSON String. """
+
 def escape_string(string):
     # type: (str) -> str
     """Escapes a string so that it can be used as a JSON string.
@@ -211,8 +218,6 @@ def loads(
 
     # ---> Decode JSON object
     if json_str.startswith("{"):
-        result = {}
-
         for index in range(len(json_str)):
             char = json_str[index]
 
@@ -259,6 +264,9 @@ def loads(
 
 
             if char in ["{", "["]:
+                if result is not None and len(nesting_levels) == 0:
+                    raise JSONDecodeError("You are trying to redefine an existing object! Maye you forgot a comma (',')?")
+                    
                 nesting_levels.append(index)
                 continue
 
@@ -271,7 +279,7 @@ def loads(
                     continue
 
                 if len(last_key) != 2:
-                    raise Exception("Unexpected key tuple length: %s" % str(last_key))
+                    raise JSONDecodeError("Malformed JSON input: Object key was not properly closed")
                 
                 key_name = json_str[last_key[0]:last_key[1]]
 
@@ -293,6 +301,11 @@ def loads(
                 #  Example: ..., "key": true}
                 if len(last_value) == 1:
                     last_value += (index,)
+
+                # Initialize the result if not done already
+                if result is None:
+                    result = {}
+
 
                 # If something is still in the value buffer then add it to the object.
                 # This is the case, for example, when a non-object value is last.
@@ -323,15 +336,19 @@ def loads(
             # ----> End of value
             elif char == ",":
                 if len(last_key) != 2:
-                    raise Exception("Unexpected key tuple length: %s" % str(last_key))
+                    raise JSONDecodeError("Comma was found but with no preceding value: %s" % str(last_key))
                 if len(last_value) == 0 or len(last_value) > 2:
-                    raise Exception("Unexpected value tuple length: %s" % str(last_value))
+                    raise JSONDecodeError("Malformed JSON input: Object value was not properly closed")
                 
                 # Values have only the starting index when are neither strings,
                 # objects or arrays (i.e. bool, int or null).
                 if len(last_value) == 1:
                     last_value += (index,)
-                
+
+                # Initialize the result if not done already
+                if result is None:
+                    result = {}
+
                 
                 key_name = json_str[last_key[0]:last_key[1]]
                 value = json_str[last_value[0]:last_value[1]]
@@ -350,8 +367,6 @@ def loads(
                 
     # ---> Decode JSON array
     elif json_str.startswith("["):
-        result = []
-        
         for index in range(len(json_str)):
             char = json_str[index]
 
@@ -386,6 +401,9 @@ def loads(
 
             # ----> JSON Object/Array
             if char in ["{", "["]:
+                if result is not None and len(nesting_levels) == 0:
+                    raise JSONDecodeError("You are trying to redefine an existing object! Maye you forgot a comma (',')?")
+                    
                 nesting_levels.append(index)
                 continue
 
@@ -412,6 +430,10 @@ def loads(
                 if len(last_value) == 1:
                     last_value += (index,)
 
+                # Initialize the result if not done already
+                if result is None:
+                    result = []
+
                 # If something is still in the value buffer then add it to the object.
                 # This is the case, for example, when a non-object value is last.
                 if len(nesting_levels) == 0 and len(last_value) == 2:
@@ -433,20 +455,24 @@ def loads(
                 continue
             
             
-            # ----> End of key
+            # ----> Wrong syntax
             elif char == ":":
-                continue
+                raise JSONDecodeError("Unexpected character '%s' inside array" % char)
             
             # ----> End of value
             elif char == ",":
                 if len(last_value) == 0 or len(last_value) > 2:
-                    raise Exception("Unexpected value tuple length: %s" % str(last_value))
+                    raise JSONDecodeError("Malformed JSON input: Array value was not properly closed")
                 
                 # Values have only the starting index when are neither strings,
                 # objects or arrays (i.e. bool, int or null).
                 if len(last_value) == 1:
                     last_value += (index,)
-                
+
+                # Initialize the result if not done already
+                if result is None:
+                    result = []
+
                 
                 value = json_str[last_value[0]:last_value[1]]
 
@@ -473,7 +499,7 @@ def loads(
         #
         #      TODO: Convert unicode strings to character and viceversa
         if json_str.startswith('"') and json_str.endswith('"'):
-            return str(json_str[1:-1]) \
+            result = str(json_str[1:-1]) \
                 .replace('\\"', '"') \
                 .replace('\\\\', '\\') \
                 .replace('\\/', '/') \
@@ -485,35 +511,38 @@ def loads(
                 .replace('\\\\u', '\\u')
         
         # ---> Numbers
-        if REGEX_INTEGER.match(json_str):
-            return int(json_str)
+        elif REGEX_INTEGER.match(json_str):
+            result = int(json_str)
         
         elif REGEX_FLOAT.match(json_str):
-            return float(json_str)
+            result = float(json_str)
         
         # ---> Boolean
         elif json_str == "true":
             if truthy_value is not None:
-                return truthy_value
+                result = truthy_value
             elif IS_POLYFILL_AVAILABLE:
                 return _bool.bool(1)
             else:
-                return __true__
+                result = __true__
             
         elif json_str == "false":
             if falsy_value is not None:
-                return falsy_value
+                result = falsy_value
             elif IS_POLYFILL_AVAILABLE:
-                return _bool.bool(0)
+                result = _bool.bool(0)
             else:
-                return __false__
+                result = __false__
         
         # ---> Null
         elif json_str == "null":
-            return None
+            result = None
         
         else:
-            raise Exception("Unhandled json value: %s" % json_str)
+            raise JSONDecodeError("Unhandled json value: %s" % json_str)
+        
+    if is_inside_string or nesting_levels:
+        raise JSONDecodeError("Malformed JSON input")
 
     return result
 
