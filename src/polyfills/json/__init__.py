@@ -360,6 +360,10 @@ def loads(
                 last_value = ()
             # endif
 
+            # ----> Raw value (ex. integer, float, boolean, null)
+            #
+            #       Save the found index and process the value after
+            #       the comma or when the closing bracket is found.
             else:
                 if not last_value:
                     last_value = last_value + (index,)
@@ -482,6 +486,10 @@ def loads(
                 last_value = ()
             # endif
 
+            # ----> Raw value (ex. integer, float, boolean, null)
+            #
+            #       Save the found index and process the value after
+            #       the comma or when the closing bracket is found.
             else:
                 if not last_value:
                     last_value = last_value + (index,)
