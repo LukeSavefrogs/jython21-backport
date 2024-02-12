@@ -108,7 +108,7 @@ def dumps(
     
 
     #  ---> Handle JSON arrays
-    elif obj_type == type([]):
+    elif obj_type in [type([None,]), type((None,))]:
         obj_string_parts.append("[")
         for item in obj:
             if len(obj_string_parts) > 1:

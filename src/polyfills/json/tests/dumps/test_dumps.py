@@ -103,7 +103,14 @@ class ArrayTestCase(unittest.TestCase):
     def test_simple(self):
         self.assertEqual(
             json.dumps(["", "test1", "", "test2", ""]),
-            '["", "test1", "", "test2", ""]'
+            '["", "test1", "", "test2", ""]',
+            "List should be converted to JSON array"
+        )
+
+        self.assertEqual(
+            json.dumps(("", "test1", "", "test2", "")),
+            '["", "test1", "", "test2", ""]',
+            "Tuple should be converted to JSON array"
         )
 
 
