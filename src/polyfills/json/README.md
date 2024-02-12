@@ -51,18 +51,6 @@ These are some known bugs that will be fixed in the next releases:
     - THIS    : '"ặ £"'
     ```
 
-- Has some problems with **backslashes** (e.g. `\n` is not converted to `\\n`).
-
-    ```pycon
-    >>> json.loads(r'"\" \\ \/ \b \f \n \r \t"')
-    - ORIGINAL: '" \\ / \x08 \x0c \n \r \t'
-    - THIS    : '" \\ / \x08 \x0c \n \r \t'
-
-    >>> json.dumps('" \\ / \x08 \x0c \n \r \t')
-    - ORIGINAL: '"\\" \\\\ / \\b \\f \\n \\r \\t"'
-    - THIS    : '"\\" \\\\ / \x08 \x0c \n \r \t"'
-    ```
-
 ## Resources
 
 - [JSON specification](https://www.json.org/json-en.html)
