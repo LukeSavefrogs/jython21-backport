@@ -22,6 +22,16 @@ class BaseTestCase(unittest.TestCase):
         	"string",
             "Strings should work"
 		)
+        self.assertEqual(
+			json.loads('"string\'"'),
+        	"string'",
+            "Strings should work (with single quotes inside)"
+		)
+        self.assertEqual(
+			json.loads('"string\""'),
+        	"string\"",
+            "Strings should work (with double quotes inside)"
+		)
         
     def test_null(self):
         self.assertEqual(
@@ -152,15 +162,39 @@ class CommentsTestCase(unittest.TestCase):
 class InvalidJSONTestCase(unittest.TestCase):
     """ Invalid JSON should raise an exception (see #16) """
     def test_invalid_structure(self):
+        # Raise if encounters a completely broken syntax
         self.assertRaises(json.JSONDecodeError, json.loads, r"""{"}""")
+        self.assertRaises(json.JSONDecodeError, json.loads, r"""{'}""")
         self.assertRaises(json.JSONDecodeError, json.loads, r"""{""")
-        self.assertRaises(json.JSONDecodeError, json.loads, r"""{"key": "val}""")
+        self.assertRaises(json.JSONDecodeError, json.loads, r"""}""")
         self.assertRaises(json.JSONDecodeError, json.loads, r"""{}[]""")
         self.assertRaises(json.JSONDecodeError, json.loads, r"""{,}""")
         self.assertRaises(json.JSONDecodeError, json.loads, r"""[,{}]""")
         self.assertRaises(json.JSONDecodeError, json.loads, r"""["key": "val"]""")
         self.assertRaises(json.JSONDecodeError, json.loads, r"""["key", """)
         self.assertRaises(json.JSONDecodeError, json.loads, r"""[""")
+        self.assertRaises(json.JSONDecodeError, json.loads, r"""]""")
+        self.assertRaises(json.JSONDecodeError, json.loads, r"""{"key": "val}""")
+
+        # Do not allow single quotes outside of a JSON string
+        self.assertRaises(json.JSONDecodeError, json.loads, r"""['key']""")
+        self.assertRaises(json.JSONDecodeError, json.loads, r"""{'key': "val"}""")
+        self.assertRaises(json.JSONDecodeError, json.loads, r"""{"key": 'val'}""")
+
+        # Allow single quotes inside of a JSON string
+        self.assertEqual(
+            json.loads(r"""["key'"]"""),
+            ["key'"],
+        )
+        self.assertEqual(
+            json.loads(r"""{"'key'": "val"}"""),
+            {"'key'": "val"},
+        )
+        self.assertEqual(
+            json.loads(r"""{"key": "'val'"}"""),
+            {"key": "'val'"},
+        )
+
 
         self.assertRaises(Exception, json.loads, r"""[string string]""")
 
@@ -170,4 +204,10 @@ class InvalidJSONTestCase(unittest.TestCase):
         
 
 if __name__ == '__main__':
+    # print(json.loads("""[true]"""))
+    # print(json.loads("""{"'test'": "ok'"}"""))
+    # print(json.loads("""{'test': "ok"}"""))
+    # print(json.loads("""{'}"""))
+    # print(json.loads("""{"}"""))
+
     unittest.main(verbosity=2, failfast=False)

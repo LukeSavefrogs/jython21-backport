@@ -259,6 +259,10 @@ def loads(
             if char.isspace() or is_inside_string:
                 continue
 
+                
+            # Check for characters not allowed by JSON standard (outside of strings)
+            if char == "'":
+                raise JSONDecodeError("Single quote is not permitted by JSON standard")
 
             # --------------------------------------------------------------
 
@@ -331,6 +335,9 @@ def loads(
             
             # ----> End of key
             elif char == ":":
+                if len(last_key) != 2:
+                    raise JSONDecodeError("Malformed JSON input: Object key cannot be empty")
+                
                 continue
             
             # ----> End of value
@@ -399,6 +406,10 @@ def loads(
             if char.isspace() or is_inside_string:
                 continue
 
+                
+            # Check for characters not allowed by JSON standard (outside of strings)
+            if char == "'":
+                raise JSONDecodeError("Single quote is not permitted by JSON standard")
 
             # --------------------------------------------------------------
 
