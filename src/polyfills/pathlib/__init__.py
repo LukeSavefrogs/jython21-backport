@@ -266,6 +266,17 @@ class Path(Base):
         except FileNotFoundError:
             if not missing_ok:
                 raise
+    
+    def rename(self, target):
+        """Rename this file or directory to the given target.
+
+        Args:
+            target (str): The new name of the file or directory.
+
+        Returns:
+            None: No return value.
+        """
+        _os.rename(str(Path(self._path).resolve()), str(Path(target).resolve()))
 
     def read_bytes(self):
         """Open the file in bytes mode, read it, and close the file.
