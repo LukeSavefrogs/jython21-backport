@@ -41,6 +41,7 @@ class _WindowsFlavour(_Flavour):
     """ Alternate pathname separator. """
 
     has_drv = 1 == 1
+    """ Whether the flavour has drive letters. """
 
     is_supported = _os.name == "nt"
     """ Wether the flavour is supported on the current platform. """
@@ -59,6 +60,7 @@ class _PosixFlavour(_Flavour):
     """ Alternate pathname separator. """
 
     has_drv = 1 == 0
+    """ Whether the flavour has drive letters. """
 
     is_supported = _os.name != "nt"
     """ Wether the flavour is supported on the current platform. """
