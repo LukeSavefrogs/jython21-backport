@@ -120,7 +120,8 @@ def sorted(__iterable, key=None, reverse=False):
             try:
                 elements.sort(key=key)
             except TypeError:
-                # Convert the key function to a cmp function, since the `key` argument is not available.
+                # Convert the key function to a `cmp` function, since the `key` argument is not available
+                # in older Python versions and raises a TypeError if used.
                 elements.sort(key_to_cmp(key))
         
         if reverse:
