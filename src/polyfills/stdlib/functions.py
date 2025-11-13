@@ -289,6 +289,46 @@ class TestSorted(_unittest.TestCase):
             [_TestClass(2), _TestClass(1), _TestClass(0)],
         )
 
+    def test_stability(self):
+        """Test sorting a list multiple times to ensure stability."""
+        # List of (name, section)
+        data = [
+            ("Dave", "A"),
+            ("Alice", "B"),
+            ("Ken", "A"),
+            ("Eric", "B"),
+            ("Carol", "A"),
+        ]
+
+        # First, sort by the second element
+        data_sorted_by_name = sorted(data, key=lambda x: x[1])
+
+        self.assertEqual(
+            data_sorted_by_name,
+            [
+                ("Dave", "A"),
+                ("Ken", "A"),
+                ("Carol", "A"),
+                ("Alice", "B"),
+                ("Eric", "B"),
+            ]
+        )
+
+        # Then, sort by the first element
+        data_sorted_by_section = sorted(data_sorted_by_name, key=lambda x: x[0])
+
+        self.assertEqual(
+            data_sorted_by_section,
+            [
+                ("Carol", "A"),
+                ("Dave", "A"),
+                ("Ken", "A"),
+                ("Alice", "B"),
+                ("Eric", "B"),
+            ]
+        )
+
+
 if __name__ == "__main__":
     _globals = globals()
 
