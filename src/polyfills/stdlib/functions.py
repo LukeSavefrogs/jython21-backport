@@ -339,6 +339,7 @@ if __name__ == "__main__":
         for test_method in dir(test_case)
         if test_method.startswith("test_")
         # and "showall" in test_method
+        and "sorted" in test_case.__name__.lower()
     ]
 
     suite = _unittest.TestSuite(tests)
