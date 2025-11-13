@@ -133,7 +133,7 @@ def sorted(__iterable, key=None, reverse=False):
                 # Convert the key function to a cmp function, since the `key` argument is not available.
                 elements.sort(key_to_cmp(key))
         
-        if reverse is True:
+        if reverse:
             elements.reverse()
 
         value = []
