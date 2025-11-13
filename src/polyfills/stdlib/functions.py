@@ -148,18 +148,22 @@ def sorted(__iterable, key=None, reverse=False):
                     return (_ReverseCompare(x[1]), x[0])
                 return (x[1], x[0])
             
+            # For very old Python versions without key support
+            def stable_cmp(a, b):
+                result = (a[1] > b[1]) - (a[1] < b[1])
+                
+                if reverse:
+                    result = -result
+
+                if result == 0:
+                    # If keys are equal, compare indices to maintain stability (never reverse index order)
+                    result = (a[0] > b[0]) - (a[0] < b[0])
+
+                return result
+
             try:
                 elements_with_index.sort(key=stable_key)
             except TypeError:
-                # For very old Python versions without key support
-                def stable_cmp(a, b):
-                    result = (a[1] > b[1]) - (a[1] < b[1])
-                    if reverse:
-                        result = -result
-                    if result == 0:
-                        # If keys are equal, compare indices to maintain stability (never reverse index order)
-                        result = (a[0] > b[0]) - (a[0] < b[0])
-                    return result
                 elements_with_index.sort(stable_cmp)
         else:
             # The `key` argument was introduced starting from Python 2.4
@@ -169,21 +173,24 @@ def sorted(__iterable, key=None, reverse=False):
                     return (_ReverseCompare(key(x[1])), x[0])
                 return (key(x[1]), x[0])
             
+            # Convert the key function to a `cmp` function for older Python versions (<3.0)
+            #    Info: https://docs.python.org/3/howto/sorting.html#the-old-way-using-the-cmp-parameter
+            # 
+            # Include index comparison for stability
+            def stable_key_to_cmp(a, b):
+                ka, kb = key(a[1]), key(b[1])
+                result = (ka > kb) - (ka < kb)
+                if reverse:
+                    result = -result
+                if result == 0:
+                    # If keys are equal, compare indices to maintain stability (never reverse index order)
+                    result = (a[0] > b[0]) - (a[0] < b[0])
+                return result
+
             try:
                 elements_with_index.sort(key=stable_key_wrapper)
             except TypeError:
-                # Convert the key function to a `cmp` function for older Python versions
-                # Include index comparison for stability
-                def stable_cmp(a, b):
-                    ka, kb = key(a[1]), key(b[1])
-                    result = (ka > kb) - (ka < kb)
-                    if reverse:
-                        result = -result
-                    if result == 0:
-                        # If keys are equal, compare indices to maintain stability (never reverse index order)
-                        result = (a[0] > b[0]) - (a[0] < b[0])
-                    return result
-                elements_with_index.sort(stable_cmp)
+                elements_with_index.sort(stable_key_to_cmp)
         
         # Extract just the elements (without indices)
         elements = [elem for _, elem in elements_with_index]
@@ -407,8 +414,7 @@ if __name__ == "__main__":
         for test_case in test_cases
         for test_method in dir(test_case)
         if test_method.startswith("test_")
-        # and "showall" in test_method
-        and test_case.__name__.lower().find("sorted") != -1
+        # and test_case.__name__.lower().find("sorted") != -1
     ]
 
     suite = _unittest.TestSuite(tests)
