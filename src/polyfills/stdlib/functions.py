@@ -90,20 +90,6 @@ def sorted(__iterable, key=None, reverse=False):
     """
     item_type = type(__iterable)
     _dict, _list, _tuple, _str = type({}), type([]), type(()), type("")
-
-    def key_to_cmp(key):
-        """ Convert a key function to a cmp function. 
-        
-        Info: https://docs.python.org/3/howto/sorting.html#the-old-way-using-the-cmp-parameter
-        """
-        def cmp(a, b):
-            """ The `cmp` function does not exist on Python 3.x.
-            
-            Source: https://stackoverflow.com/a/22490617/8965861
-            """
-            return (a > b) - (a < b) 
-
-        return lambda x, y: cmp(key(x), key(y))
     
     class _ReverseCompare:
         """Wrapper class to reverse comparison for a single sort key component.
