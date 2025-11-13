@@ -127,9 +127,9 @@ def sorted(__iterable, key=None, reverse=False):
             elements.sort()
         else:
             # The `key` argument was introduced starting from Python 2.4
-            if _sys.version_info >= (2, 4):
+            try:
                 elements.sort(key=key)
-            else:
+            except TypeError:
                 # Convert the key function to a cmp function, since the `key` argument is not available.
                 elements.sort(key_to_cmp(key))
         
