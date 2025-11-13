@@ -90,51 +90,96 @@ def sorted(__iterable, key=None, reverse=False):
     """
     item_type = type(__iterable)
     _dict, _list, _tuple, _str = type({}), type([]), type(()), type("")
-
-    def key_to_cmp(key):
-        """ Convert a key function to a cmp function. 
+    
+    class _ReverseCompare:
+        """Wrapper class to reverse comparison for a single sort key component.
         
-        Info: https://docs.python.org/3/howto/sorting.html#the-old-way-using-the-cmp-parameter
+        This allows us to reverse only the primary sort key while keeping
+        the secondary index-based key in normal order for stability.
         """
-        def cmp(a, b):
-            """ The `cmp` function does not exist on Python 3.x.
-            
-            Source: https://stackoverflow.com/a/22490617/8965861
-            """
-            return (a > b) - (a < b) 
-
-        # def cmp_func(x, y):
-        #     if key(x) < key(y):
-        #         return -1
-        #     elif key(x) > key(y):
-        #         return 1
-        #     else:
-        #         return 0
-        # def cmp_func(x, y):
-        #     return cmp(key(x), key(y))
-        # return cmp_func
-        return lambda x, y: cmp(key(x), key(y))
+        def __init__(self, obj):
+            self.obj = obj
+        
+        def __lt__(self, other):
+            return self.obj > other.obj
+        
+        def __gt__(self, other):
+            return self.obj < other.obj
+        
+        def __eq__(self, other):
+            return self.obj == other.obj
+        
+        def __le__(self, other):
+            return self.obj >= other.obj
+        
+        def __ge__(self, other):
+            return self.obj <= other.obj
+        
+        def __ne__(self, other):
+            return self.obj != other.obj
     
     # ---> List
     #
     #      When passed a list, the original `sorted` function
     #      sorts its elements as expected.
     if item_type == _list:
-        elements = [elem for elem in __iterable]  # Make a copy of the original iterable
+        # Make a copy and add original indices for stable sorting
+        elements_with_index = [(i, elem) for i, elem in enumerate(__iterable)]
 
         if key is None:
             # If no key function is passed, sort the elements as they are
-            elements.sort()
+            # Add index as secondary sort key to ensure stability
+            def stable_key(x):
+                if reverse:
+                    return (_ReverseCompare(x[1]), x[0])
+                return (x[1], x[0])
+            
+            # For very old Python versions without key support
+            def stable_cmp(a, b):
+                result = (a[1] > b[1]) - (a[1] < b[1])
+                
+                if reverse:
+                    result = -result
+
+                if result == 0:
+                    # If keys are equal, compare indices to maintain stability (never reverse index order)
+                    result = (a[0] > b[0]) - (a[0] < b[0])
+
+                return result
+
+            try:
+                elements_with_index.sort(key=stable_key)
+            except TypeError:
+                elements_with_index.sort(stable_cmp)
         else:
             # The `key` argument was introduced starting from Python 2.4
+            # Wrap the key function to include the index for stability
+            def stable_key_wrapper(x):
+                if reverse:
+                    return (_ReverseCompare(key(x[1])), x[0])
+                return (key(x[1]), x[0])
+            
+            # Convert the key function to a `cmp` function for older Python versions (<3.0)
+            #    Info: https://docs.python.org/3/howto/sorting.html#the-old-way-using-the-cmp-parameter
+            # 
+            # Include index comparison for stability
+            def stable_key_to_cmp(a, b):
+                ka, kb = key(a[1]), key(b[1])
+                result = (ka > kb) - (ka < kb)
+                if reverse:
+                    result = -result
+                if result == 0:
+                    # If keys are equal, compare indices to maintain stability (never reverse index order)
+                    result = (a[0] > b[0]) - (a[0] < b[0])
+                return result
+
             try:
-                elements.sort(key=key)
+                elements_with_index.sort(key=stable_key_wrapper)
             except TypeError:
-                # Convert the key function to a cmp function, since the `key` argument is not available.
-                elements.sort(key_to_cmp(key))
+                elements_with_index.sort(stable_key_to_cmp)
         
-        if reverse:
-            elements.reverse()
+        # Extract just the elements (without indices)
+        elements = [elem for _, elem in elements_with_index]
 
         value = []
         for element in elements:
@@ -289,6 +334,53 @@ class TestSorted(_unittest.TestCase):
             [_TestClass(2), _TestClass(1), _TestClass(0)],
         )
 
+    def test_stability(self):
+        """Test sorting a list multiple times to ensure stability.
+        
+        Demonstrates the idiom of sorting by secondary key first, then primary key.
+        This leverages sort stability to achieve multi-key sorting.
+        """
+        # List of (name, section)
+        data = [
+            ("Dave", "A"),
+            ("Alice", "B"),
+            ("Ken", "A"),
+            ("Eric", "B"),
+            ("Carol", "A"),
+        ]
+
+        # First, sort by name (secondary key)
+        data_sorted_by_name = sorted(data, key=lambda x: x[0])
+
+        self.assertEqual(
+            data_sorted_by_name,
+            [
+                ("Alice", "B"),
+                ("Carol", "A"),
+                ("Dave", "A"),
+                ("Eric", "B"),
+                ("Ken", "A"),
+            ],
+            "First sort by name should produce alphabetical order"
+        )
+
+        # Then, sort by section (primary key)
+        # Since sort is stable, within each section the name order is preserved
+        data_sorted_by_section = sorted(data_sorted_by_name, key=lambda x: x[1])
+
+        self.assertEqual(
+            data_sorted_by_section,
+            [
+                ("Carol", "A"),
+                ("Dave", "A"),
+                ("Ken", "A"),
+                ("Alice", "B"),
+                ("Eric", "B"),
+            ],
+            "Second sort by section should group by section while preserving name order within each section"
+        )
+
+
 if __name__ == "__main__":
     _globals = globals()
 
@@ -308,7 +400,7 @@ if __name__ == "__main__":
         for test_case in test_cases
         for test_method in dir(test_case)
         if test_method.startswith("test_")
-        # and "showall" in test_method
+        # and test_case.__name__.lower().find("sorted") != -1
     ]
 
     suite = _unittest.TestSuite(tests)
