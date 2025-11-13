@@ -103,16 +103,6 @@ def sorted(__iterable, key=None, reverse=False):
             """
             return (a > b) - (a < b) 
 
-        # def cmp_func(x, y):
-        #     if key(x) < key(y):
-        #         return -1
-        #     elif key(x) > key(y):
-        #         return 1
-        #     else:
-        #         return 0
-        # def cmp_func(x, y):
-        #     return cmp(key(x), key(y))
-        # return cmp_func
         return lambda x, y: cmp(key(x), key(y))
     
     # ---> List
