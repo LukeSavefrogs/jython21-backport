@@ -138,10 +138,13 @@ def discover_tests(start_directory="src", file_pattern="test*.py", package_path=
                     pass
 
             contains_test_case = re.search(
-                "^\s*class (Test.*?|.*?TestCase\s*)\(.*?\.TestCase\)\s*:\s*(#.*)?$",
+                r"^\s*class (Test.*?|.*?TestCase\s*)\(.*?\.TestCase\)\s*:\s*(#.*)?$",
                 contents,
                 re.MULTILINE,
             )
+
+            if package_directory is None:
+                raise Exception("Could not determine package directory for file: %s" % root)
 
             if contains_test_case:
                 file_in_package = os.path.normpath(root)[len(os.path.normpath(package_directory)) + 1 :][:-3]
