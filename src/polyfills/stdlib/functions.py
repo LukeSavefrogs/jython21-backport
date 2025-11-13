@@ -147,6 +147,7 @@ def sorted(__iterable, key=None, reverse=False):
                 if reverse:
                     return (_ReverseCompare(x[1]), x[0])
                 return (x[1], x[0])
+            
             try:
                 elements_with_index.sort(key=stable_key)
             except TypeError:
